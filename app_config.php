@@ -1,17 +1,19 @@
 <?php
+
 ini_set('display_errors', 'Off');
+
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+$forwardedProto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '';
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || strtolower($forwardedProto) === 'https';
+$path = parse_url($requestUri, PHP_URL_PATH) ?: '/';
+$segments = array_values(array_filter(explode('/', trim($path, '/'))));
+$realLink = (($segments[0] ?? '') === 'test') ? 'test/' : '';
 $curr_url = explode("/","$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
-if($curr_url[1] == 'test'){
-	$real_link = 'test/';
-}else{
-	$real_link = '';
-}
+$url = $host . '/' . $realLink;
+$protocol = $isHttps ? 'https://' : 'http://';
+$app_url = $protocol . $host . '/' . $realLink;
 
-$url = $_SERVER['HTTP_HOST'].'/'.$real_link;
-$protocol = empty($_SERVER["HTTPS"]) ? 'http://' : 'https://';
-
-// get host.
-$app_url = $protocol.$_SERVER['HTTP_HOST'].'/'.$real_link;
 define('APP_URL', $app_url);
 define('APP_PATH', dirname(__FILE__).'/');
 define("APP_URL_SHORT", "//".$url);
@@ -57,14 +59,13 @@ $lang_urls = [
 
 /* set language link */
 $curr_url = explode("/","$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
-$lang = $curr_url[1];
-$folder = isset($curr_url[2]) ? trim($curr_url[2]) : '';
+$lang = $segments[0] ?? '';
+$folder = isset($lang[1]) ? trim($lang[1]) : '';
 if($lang == 'en' || $folder == 'en') {
 	$html_lang = 'en';
 	$alter_lang = 'vi';
 	$lang_link = 'en/';
-
-	if($curr_url[1] == 'test'){
+	if ($lang == 'test') {
 		$alter_href = str_replace('/en', '', $_SERVER['REQUEST_URI']);
 		$btn_lang = str_replace('/test/en/', '', $_SERVER['REQUEST_URI']);
 	}else{
@@ -117,8 +118,7 @@ if($lang == 'en' || $folder == 'en') {
 	$html_lang = 'vi';
 	$alter_lang = 'en';
 	$lang_link = '';
-
-	if($curr_url[1] == 'test'){
+	if($lang == 'test') {
 		$currpath = str_replace('/test/', '', $_SERVER['REQUEST_URI']);
 		$alter_href = '/test/en/'.$currpath;
 		$btn_lang = 'en/'.$currpath;

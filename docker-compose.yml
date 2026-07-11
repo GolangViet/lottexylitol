@@ -4,12 +4,16 @@ services:
 
     # Nginx
     web:
+        container_name: lottexylitol-web
         image: nginx:stable-alpine
         ports:
-            - '$WEB_PORT_CONTAINER_EXPOSE:80'
+            - "$WEB_PORT_CONTAINER_EXPOSE:80"
         volumes:
             - ./:/var/www
-            - ./docker/nginx/templates:/etc/nginx/templates
+            - ./docker/nginx/local/default.conf:/etc/nginx/conf.d/default.conf:ro
+#           For production
+#            - ./docker/nginx/prod/default.conf:/etc/nginx/conf.d/default.conf:ro
+            - ./docker/nginx/snippets:/etc/nginx/snippets:ro
         environment:
             ENABLE_FASTCGI_PARAM_NGINX_HTTPS: "${ENABLE_FASTCGI_PARAM_NGINX_HTTPS:-false}"
         depends_on:
@@ -21,6 +25,7 @@ services:
             - app-lottexylitol-network
     # PHP
     app:
+        container_name: lottexylitol-app
         build:
             context: .
             dockerfile: ./docker/php/Dockerfile
@@ -37,6 +42,7 @@ services:
 
     # MariaDB
     db:
+        container_name: lottexylitol-db
         image: mariadb:10.11.13
         ports:
             - "${DB_PORT_CONTAINER_EXPOSE:-3306}:3306"
@@ -44,7 +50,7 @@ services:
             MARIADB_USER: "${DB_USERNAME}"
             MARIADB_PASSWORD: "${DB_PASSWORD}"
             MARIADB_DATABASE: "${DB_DATABASE}"
-            MARIADB_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+            MARIADB_ROOT_PASSWORD: "${DB_PASSWORD}"
         volumes:
             - ./docker/mariadb/mariadb-data:/var/lib/mysql
         healthcheck:
