@@ -4,5 +4,6 @@
 /.vscode
 /docker/mysql/database
 /docker/mysql/ib_buffer_pool
+/docker/mariadb/mariadb-data
 /docker/postgres/postgres-data
 *.DS_Store
