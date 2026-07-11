@@ -1,0 +1,469 @@
+openapi: 3.0.3
+info:
+  title: Swagger CDP - OpenAPI 3.0
+  description: Swagger CDP
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: /api
+paths:
+  /user/signin:
+    post:
+      tags:
+        - User
+      summary: Get User Token
+      description: Get User Token
+      operationId: getUserToken
+      requestBody:
+        description: Get User Token
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserSignin'
+        required: true
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+        '401':
+          description: Invalid input
+  /user/info:
+    get:
+      tags:
+        - User
+      summary: Get User Info
+      description: This can only be done by the logged in user.
+      operationId: getUserInfo
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseUser'
+      security:
+        - jwt_token: []
+  /cdp/surveys:
+    get:
+      tags:
+        - CDP
+      summary: Get Surveys
+      description: This can only be done by the logged in user.
+      operationId: getSurveys
+      parameters:
+        - name: day
+          in: query
+          description: Filter by day
+          required: true
+          schema:
+            type: string
+            example: all
+        - name: last_days
+          in: query
+          description: Set last_days
+          required: false
+          schema:
+            type: number
+            example: 0
+        - name: limit
+          in: query
+          description: Set limit
+          required: false
+          schema:
+            type: number
+            example: 100
+        - name: paged
+          in: query
+          description: Set paged
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseList'
+      security:
+        - jwt_token: []
+  /cdp/users:
+    get:
+      tags:
+        - CDP
+      summary: Get Users
+      description: This can only be done by the logged in user.
+      operationId: getUsers
+      parameters:
+        - name: user_status
+          in: query
+          description: Filter by user_status
+          required: true
+          schema:
+            type: string
+            example: deleted
+        - name: last_days
+          in: query
+          description: Set last_days
+          required: false
+          schema:
+            type: number
+            example: 0
+        - name: limit
+          in: query
+          description: Set limit
+          required: false
+          schema:
+            type: number
+            example: 100
+        - name: paged
+          in: query
+          description: Set paged
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseList'
+      security:
+        - jwt_token: []
+  /cdp/users-activities:
+    get:
+      tags:
+        - CDP
+      summary: Get Users Activities
+      description: This can only be done by the logged in user.
+      operationId: getUsersActivities
+      parameters:
+        - name: day
+          in: query
+          description: Filter by day
+          required: true
+          schema:
+            type: string
+            example: all
+        - name: limit
+          in: query
+          description: Set limit
+          required: false
+          schema:
+            type: number
+            example: 100
+        - name: paged
+          in: query
+          description: Set paged
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseList'
+      security:
+        - jwt_token: []
+  /cdp/lucky-wheel/spins:
+    get:
+      tags:
+        - CDP
+      summary: Get lucky wheel spins
+      description: This can only be done by the logged in user.
+      operationId: getLuckyWheelSpins
+      parameters:
+        - name: user_id
+          in: query
+          description: ID of user to return
+          required: false
+          schema:
+            type: string
+            description: user_93
+        - name: from_date
+          in: query
+          description: date for filter
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to_date
+          in: query
+          description: date for filter
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: reward_type
+          in: query
+          description: reward type for filter
+          required: false
+          schema:
+            type: string
+            enum:
+              - mobile-card
+              - e-voucher
+              - gold-card
+        - name: last_days
+          in: query
+          description: Set last_days
+          required: false
+          schema:
+            type: number
+            example: 0
+        - name: limit
+          in: query
+          description: Set limit
+          required: false
+          schema:
+            type: number
+            example: 100
+        - name: paged
+          in: query
+          description: Set paged
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseList'
+      security:
+        - jwt_token: []
+  /cdp/lucky-wheel/users:
+    get:
+      tags:
+        - CDP
+      summary: Get lucky wheel users
+      description: This can only be done by the logged in user.
+      operationId: getLuckyWheelUsers
+      parameters:
+        - name: user_id
+          in: query
+          description: ID of user to return
+          required: false
+          schema:
+            type: string
+            description: user_93
+        - name: email
+          in: query
+          description: email for filter
+          required: false
+          schema:
+            type: string
+            description: test@gmail.com
+        - name: last_days
+          in: query
+          description: Set last_days
+          required: false
+          schema:
+            type: number
+            example: 0
+        - name: limit
+          in: query
+          description: Set limit
+          required: false
+          schema:
+            type: number
+            example: 100
+        - name: paged
+          in: query
+          description: Set paged
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseList'
+      security:
+        - jwt_token: []
+  /cdp/lucky-wheel/rewards:
+    get:
+      tags:
+        - CDP
+      summary: Get lucky wheel rewards
+      description: This can only be done by the logged in user.
+      operationId: getLuckyWheelRewards
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseList'
+      security:
+        - jwt_token: []
+components:
+  schemas:
+    User:
+      required:
+        - name
+        - email
+        - phone
+        - address
+        - city
+        - gender
+        - age
+      type: object
+      properties:
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@email.com
+        phone:
+          type: string
+          example: '0931231234'
+        address:
+          type: string
+          example: 123 Street
+        city:
+          type: string
+          example: HCM
+        gender:
+          type: string
+          example: male
+        age:
+          type: number
+          example: 18
+    UserSignin:
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        username:
+          type: string
+          example: '0901234567'
+          description: email or phone
+        password:
+          type: string
+          example: '2mzaksEzr3dhQX4lmEF3'
+    Survey:
+      required:
+        - day
+      type: object
+      properties:
+        day:
+          type: string
+          example: all
+          description: all or date (yyyy-mm-dd)
+        limit:
+          type: number
+          description: 100
+        paged:
+          type: number
+          description: 1
+    UserBody:
+      required:
+        - user_status
+      type: object
+      properties:
+        user_status:
+          type: string
+          enum:
+            - deleted
+          example: 'deleted'
+    UserDeleted:
+      required:
+        - user_status
+      type: object
+      properties:
+        user_id:
+          type: number
+          example: 1
+        created:
+          type: string
+          example: datetime
+    ActivitiesBody:
+      required:
+        - day
+      type: object
+      properties:
+        day:
+          type: string
+          example: all
+          description: all or date (yyyy-mm-dd)
+    Response:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        error:
+          type: string
+          example: errors
+        message:
+          type: string
+          description: message
+    ResponseList:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        items:
+          type: string
+          example: list items
+        message:
+          type: string
+          description: message
+    ResponseToken:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        iat:
+          type: string
+          example: time
+        expires_in:
+          type: string
+          example: expires time
+        jwt_token:
+          type: string
+          description: code
+    ResponseUser:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        user:
+          schema:
+            $ref: '#/components/schemas/User'
+        message:
+          type: string
+          description: message
+  securitySchemes:
+    jwt_token:
+      type: apiKey
+      name: token
+      in: header

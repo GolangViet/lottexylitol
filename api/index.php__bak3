@@ -1,0 +1,78 @@
+<?php
+include_once('../app_config.php');
+include(APP_PATH.'libs/lotte-api.php');
+
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Content-Type: application/json");
+
+$response = [
+    'code' => 400,
+    // 'ser' => $_SERVER,
+    'message' => 'Bad request'
+];
+
+if(empty($_SERVER['REQUEST_URI'])) {
+    die(json_encode($response));
+}
+
+$uri = $_SERVER['REQUEST_URI'];
+
+$parts = explode('?', str_replace('/api', '', $uri));
+
+$pathname = rtrim($parts[0], '/');
+
+if($pathname == '') {
+    $response['message'] = 'Bad request route';
+
+    die(json_encode($response));
+}
+
+// recaptcha siteverify before require wp
+if($pathname == '/user/signin' && defined('RECAPTCHA_SECRET_KEY') && isset($_POST['g-recaptcha-response'])) {
+    $curl_body = $lotte_api->curl_send('https://www.google.com/recaptcha/api/siteverify', array(
+        'secret'    => RECAPTCHA_SECRET_KEY,
+        'response'  => $_POST['g-recaptcha-response'],
+        'remoteip'  => $_SERVER['REMOTE_ADDR'],
+    ), array(
+        'referer' => APP_URL
+    ));
+
+    if (empty($curl_body) || substr($curl_body, 0, 1) != '{') {
+        $response['message'] = 'Bad request recaptcha';
+
+        die(json_encode($response));
+    }
+
+    $body = json_decode($curl_body, true);
+
+    if (empty($body['success']) || $body['success'] != true) {
+        $response['recaptcha'] = $body;
+        $response['error'] = 'Đăng nhập không thành công!';
+
+        die(json_encode($response));
+    }
+}
+
+/**
+ * Require WP Core
+ */
+$file = dirname(__DIR__) . '/apw/wp-load.php';
+if (file_exists($file)) {
+    require_once $file;
+} else {
+    $response['message'] = 'Bad request core';
+
+    die(json_encode($response));
+}
+
+if (function_exists('site_api_request_route')) {
+    $response = site_api_request_route($pathname);
+} else {
+    $response['message'] = 'Bad request route core';
+}
+
+// if (isset($response['code'])) {
+//     http_response_code($response['code']);
+// }
+
+die(json_encode($response));

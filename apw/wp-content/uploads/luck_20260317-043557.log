@@ -1,0 +1,19 @@
+======== [ 20260317-043533 ] ======
+BEGIN LUCKY
+
+
+======== [ 20260317-043543 ] ======
+{"user_gift_limit":[]}
+
+
+======== [ 20260317-043543 ] ======
+{"rates":{"5":{"id":"75","name":"Chúc may mắn lần sau","gift_id":"5","total":781704,"rate":781704,"rate_t2":60,"date_from":"2026-03-09 00:00:00","date_to":"2026-03-17 23:59:59"}}}
+
+
+======== [ 20260317-043543 ] ======
+{"user_can_get_rates":[{"id":"75","name":"Chúc may mắn lần sau","gift_id":"5","total":781704,"rate":781704,"rate_t2":60,"date_from":"2026-03-09 00:00:00","date_to":"2026-03-17 23:59:59","gift":{"id":"5","name":"Chúc may mắn lần sau","name_en":"Better luck next time","number":"0","user_limit":"-1","total":"781704","type":"","value":"","title":"try again","title_en":"","image":"","image_en":"","description":"CHÚC BẠN MAY MẮN LẦN SAU...","description_en":"CHÚC BẠN MAY MẮN LẦN SAU..."}}]}
+
+
+======== [ 20260317-043557 ] ======
+{"response":{"code":200,"result":{"id":"75","name":"Chúc may mắn lần sau","gift_id":"5","total":781704,"rate":781704,"rate_t2":60,"date_from":"2026-03-09 00:00:00","date_to":"2026-03-17 23:59:59","gift":{"id":"5","name":"Chúc may mắn lần sau","name_en":"Better luck next time","number":"0","user_limit":"-1","total":"781704","type":"","value":"","title":"try again","title_en":"","image":"","image_en":"","description":"CHÚC BẠN MAY MẮN LẦN SAU...","description_en":"CHÚC BẠN MAY MẮN LẦN SAU..."},"user_code":"VKIZ419IW3","new":91048},"message":"Request success"}}
+

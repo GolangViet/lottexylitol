@@ -1,0 +1,81 @@
+.site_survey_questions {
+    counter-reset: number;
+}
+
+.site_survey_questions ul {
+    margin: 0;
+    border: 1px solid #ddd;
+    border-bottom: 0;
+}
+
+.site_survey_questions .ui-sortable li:hover{
+    cursor: move;
+}
+
+.site_survey_questions li {
+    margin: 0;
+    position: relative;
+    padding: 50px 10px 10px 40px;
+    border-bottom: 1px solid #ddd;
+}
+
+.site_survey_questions li .button-close{
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+.site_survey_questions li::before{
+    counter-increment: number;
+
+    content: counter(number);
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 30px;
+    font-weight: bold;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ddd;
+    border-right: 1px solid #aaa;
+}
+
+.site_survey_questions .site_survey_group{
+    margin-bottom: 15px;
+}
+
+.site_survey_questions .site_survey_group:last-child{
+    margin-bottom: 0;
+}
+
+.site_survey_questions .row{
+    display: flex;
+    padding-right: 10px;
+}
+
+.site_survey_questions .row > *{
+    flex: 1 0 0%;
+    width: 100%;
+}
+
+.site_survey_questions .row > .label{
+    flex: 0 0 auto;
+    width: 15%;
+}
+
+@media screen and (max-width: 767px) {
+    .site_survey_questions .site_survey_group{
+        margin-bottom: 0;
+    }
+
+    .site_survey_questions .row{
+        display: block;
+    }
+
+    .site_survey_questions .row > *{
+        width: 100%;
+    }
+}

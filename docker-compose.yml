@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+
+    # Nginx
+    web:
+        image: nginx:stable-alpine
+        ports:
+            - '$WEB_PORT_CONTAINER_EXPOSE:80'
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/templates:/etc/nginx/templates
+        environment:
+            ENABLE_FASTCGI_PARAM_NGINX_HTTPS: "${ENABLE_FASTCGI_PARAM_NGINX_HTTPS:-false}"
+        depends_on:
+            app:
+                condition: service_started
+            db:
+                condition: service_healthy
+        networks:
+            - app-lottexylitol-network
+    # PHP
+    app:
+        build:
+            context: .
+            dockerfile: ./docker/php/Dockerfile
+        ports:
+            - "${APP_PORT_CONTAINER_EXPOSE:-9000}:9000"
+        volumes:
+            - ./:/var/www
+            - ./docker/php/custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini
+        depends_on:
+            db:
+                condition: service_healthy
+        networks:
+            - app-lottexylitol-network
+
+    # MariaDB
+    db:
+        image: mariadb:10.11.13
+        ports:
+            - "${DB_PORT_CONTAINER_EXPOSE:-3306}:3306"
+        environment:
+            MARIADB_USER: "${DB_USERNAME}"
+            MARIADB_PASSWORD: "${DB_PASSWORD}"
+            MARIADB_DATABASE: "${DB_DATABASE}"
+            MARIADB_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+        volumes:
+            - ./docker/mariadb/mariadb-data:/var/lib/mysql
+        healthcheck:
+            test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -u root -p$${MARIADB_ROOT_PASSWORD} --silent"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+        networks:
+            - app-lottexylitol-network
+networks:
+    app-lottexylitol-network:
+        driver: bridge

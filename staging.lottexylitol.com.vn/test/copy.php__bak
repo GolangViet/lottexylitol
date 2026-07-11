@@ -1,0 +1,485 @@
+<?php
+Site::load();
+?>
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="profile" href="http://gmpg.org/xfn/11">
+    <title>Copy Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container pt-2">
+        <h1 class="mb-3">Copy folder</h1>
+        <form method="post" onsubmit="return confirm('Are you sure?');">
+            <div class="input-group mb-3">
+                <span class="input-group-text">From</span>
+                <input type="text" class="form-control" id="from" placeholder="/www/html/folder-from/" aria-label="From" name="from" value="<?php echo $from = Site::get('from') ?>" required aria-required="true">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">To</span>
+                <input type="text" class="form-control" id="to" placeholder="/www/html/folder-to/" aria-label="To" name="to" value="<?php echo $to = Site::get('to') ?>" required aria-required="true">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Backup</span>
+                <input type="text" class="form-control" id="backup" placeholder="/www/html/folder-backup/" aria-label="Backup" name="backup" value="<?php echo $backup = Site::get('backup') ?>">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Captcha</span>
+                <input type="text" class="form-control" id="captcha" placeholder="Captcha" aria-label="Captcha" name="captcha" value="" required aria-required="true">
+                <span class="input-group-text"><?php echo Site::get_token() ?></span>
+            </div>
+            <?php $option = Site::get('option', 1) ?>
+            <div class="mb-3">
+                <label>
+                    <input type="radio" name="option" value="1" <?php echo $option == 1 ? 'checked' : '' ?>>
+                    Default.
+                </label>
+            </div>
+            <div class="mb-3">
+                <label>
+                    <input type="radio" name="option" value="2" <?php echo $option == 2 ? 'checked' : '' ?>>
+                    Copy according to the file list of folder "To". (Sao chép theo danh sách tập tin của thư mục "TO")
+                </label>
+            </div>
+            <div class="mb-3 text-center">
+                <button type="submit" name="action" value="copy" class="btn btn-primary">Copy</button>
+                <a href="?" class="btn btn-danger">Reset</a>
+            </div>
+        </form>
+        <table class="table-results table table-bordered table-responsive mb-5">
+            <thead>
+                <tr>
+                    <th width="45%">From</th>
+                    <th width="45%">To</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $captcha = Site::get('captcha');
+                if($captcha == '' || Site::verify_token($captcha) == false) {
+                    echo '<tr><td colspan=3><b class="text-danger">Captcha not valid!</b></td></tr>';
+                } else if (!is_dir($from)) {
+                    echo '<tr><td colspan=3><b class="text-danger">[From] not exists!</b></td></tr>';
+                } else if (!is_dir($to)) {
+                    echo '<tr><td colspan=3><b class="text-danger">[To] not exists!</b></td></tr>';
+                } else {
+                    $from   = Site::path_trim($from);
+                    $to     = Site::path_trim($to);
+                    $backup = Site::path_trim($backup);
+                    if($option == 2) {
+                        Site::copy_folder_option_2($from, $to, $backup, true);
+                    } else {
+                        Site::copy_folder($from, $to, $backup, true);
+                    }
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        (function($) {
+
+            var filenames = <?php echo json_encode($filenames) ?>,
+                file_index = -1,
+                title = $('title').text(),
+                change = 0,
+                stop = false;
+
+            function check() {
+                file_index++;
+
+                if (file_index == 0) {
+                    $('body').addClass('loading');
+                } else if (stop || file_index >= filenames.length) {
+                    $('body').removeClass('loading');
+
+                    $('.btn-submit').removeClass('d-none');
+                    $('.btn-stop').addClass('d-none');
+
+                    scrollTop(0);
+
+                    if (<?php echo $auto ?>) {
+                        setTimeout(() => {
+                            location.href = "?step=<?php echo $step + 1 ?>&auto=1"
+                        }, 100);
+                    }
+
+                    return false;
+                }
+
+                var row = $('.table-results tbody tr:eq(' + file_index + ')'),
+                    filename = $('.url', row).text();
+
+                if (filename != '') {
+
+                    $('.name', row).text('Processing ...');
+
+                    $.get('?t=' + (new Date().getTime()), {
+                        step: <?php echo $step ?>,
+                        filename: filename,
+                        change: change
+                    }, function(res) {
+
+                        if (res.code == 200) {
+                            $('.name', row).text(res.message);
+                        } else {
+                            $('.name', row).text(res.message).css('color', 'red');
+                        }
+
+                        row.toggleClass('bg-warning unused', res.code != 200);
+
+                        setTimeout(check, 50);
+                    }, 'json').fail(function(error) {
+                        console.log("error", url_index, file_index, error);
+
+                        $('.name', row).text('fail');
+                        setTimeout(check, 50);
+                    });
+                }
+            }
+
+            function update_row(index) {
+                $('.table-results tbody tr:eq(' + index + ') .name').text('O');
+            }
+
+            function add_row(data) {
+                var tbody = $('.table-results tbody'),
+                    index = tbody.find('tr').length + 1;
+
+                tbody.append('<tr><td>' + index + '</td><td>' + data.filename + '</td><td>' + data.url + '</td></tr>');
+            }
+
+            function scrollTop(top) {
+                $(window).scrollTop(top);
+            }
+
+            $(window).on('load', function() {
+
+                $('.btn-submit').on('click', function(e) {
+                    e.preventDefault();
+
+                    change = parseInt($(this).data('change') || 0);
+
+                    check();
+
+                    $(this).addClass('d-none');
+                    $('.btn-stop').removeClass('d-none');
+                });
+
+                $('.btn-stop').on('click', function(e) {
+                    e.preventDefault();
+
+                    stop = true;
+                });
+
+                if (<?php echo $auto ?>) {
+                    $('.js-auto-click').trigger('click');
+                }
+
+            });
+
+        })(jQuery);
+    </script>
+</body>
+
+</html>
+
+<?php
+class Site
+{
+    static function get($key = '', $default = '')
+    {
+        $value = $default;
+
+        if (isset($_POST[$key])) {
+            $value = $_POST[$key];
+        } else if (isset($_GET[$key])) {
+            $value = $_GET[$key];
+        }
+
+        if (!is_array($default) && !is_object($default)) {
+            $value = trim($value);
+        }
+
+        return $value;
+    }
+
+    static function path_trim($path = '')
+    {
+        return rtrim(str_replace(['\\', '/'], DS, $path), DS);
+    }
+
+    static function get_filenames($path = '', $preg = '', $root = '')
+    {
+        $names = [];
+
+        $files = scandir($path);
+        if (count($files) > 2) {
+            foreach ($files as $file) {
+                if ($file != '.' && $file != '..') {
+                    $name = $file;
+                    $path_file = $path . DS .  $file;
+
+                    if ($root != '') {
+                        $name = str_replace([$root, DS], ['', '/'], $path_file);
+                    }
+
+                    if (is_dir($path_file)) {
+                        $names = array_merge(self::get_filenames($path_file, $preg, $root), $names);
+                    } else if ($preg != '') {
+                        if (preg_match($preg, $name)) {
+                            $names[] = $name;
+                        }
+                    } else {
+                        $names[] = $name;
+                    }
+                }
+            }
+        }
+
+        return $names;
+    }
+
+    static function mkdir_folder($path = '', $root = '')
+    {
+        if ($path == '') return false;
+
+        $path = str_replace('/', DS, $path);
+
+        if ($root == '') {
+            $root = dirname($path);
+        }
+
+        $root = str_replace('/', DS, $root);
+
+        $list = explode(DS, str_replace($root, '', $path));
+
+        $path_folder = $root;
+
+        foreach ($list as $name) {
+            $path_folder .= DS . $name;
+            if (is_dir($path_folder) == false) {
+                @mkdir($path_folder);
+            }
+        }
+    }
+
+    static function empty_folder($path = '', $rmdir = false)
+    {
+        if (is_dir($path) == false) return;
+
+        $path = str_replace('/', DS, $path);
+
+        $this_file_name = basename(__FILE__);
+
+        $files = scandir($path);
+        if (count($files) > 2) {
+            foreach ($files as $file) {
+                if ($file != '.' && $file != '..') {
+                    $path_file = $path . DS . $file;
+                    if (is_dir($path_file)) {
+                        self::empty_folder($path_file, true);
+                    } else if ($file != $this_file_name) {
+                        unlink($path_file);
+                    }
+                }
+            }
+        }
+
+        if ($rmdir) {
+            rmdir($path);
+        }
+    }
+
+    static function copy_folder($from = '', $to = '', $backup = '', $echo = false)
+    {
+        if ($from == '' || $to == '' || is_dir($from) == false) return;
+
+        $files = scandir($from);
+        if (count($files) > 2) {
+            self::mkdir_folder($to);
+
+            if($backup != ''){
+                self::mkdir_folder($backup);
+            }
+
+            foreach ($files as $file) {
+                if (!in_array($file, ['.', '..', 'scss', '.DS_Store'])) {
+                    $path_file = $from . DS . $file;
+                    $path_to   = $to . DS . $file;
+                    $path_backup = $backup != '' ? $backup . DS . $file : '';
+                    if (is_dir($path_file)) {
+                        self::copy_folder($path_file, $path_to, $path_backup, $echo);
+                    } else {
+                        $bak = null;
+
+                        if($backup != '' && file_exists($path_to)) {
+                            $bak = rename($path_to, $path_backup);
+                        }
+
+                        $copied = copy($path_file, $path_to);
+
+                        if ($echo) {
+                            echo '<tr>';
+                            echo '<td>' . str_replace($_SERVER['DOCUMENT_ROOT'], '', $path_file) . '</td>';
+                            echo '<td>' . str_replace($_SERVER['DOCUMENT_ROOT'], '', $path_to) . '</td>';
+                            echo '<td class="text-' . ($copied ? "success" : 'danger') . '">' 
+                                . ($bak != null ? ($bak ? "Backuped" : 'Backup error') : 'No backup' ) 
+                                . ' - '
+                                . ($copied ? "Copied" : 'Error') 
+                                . '</td>';
+                            echo '</tr>';
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    static function copy_folder_option_2($from = '', $to = '', $backup = '', $echo = false)
+    {
+        if ($from == '' || $to == '' || is_dir($from) == false) return;
+
+        $files = scandir($to);
+        if (count($files) > 2) {
+
+            if($backup != ''){
+                self::mkdir_folder($backup);
+            }
+
+            foreach ($files as $file) {
+                if (!in_array($file, ['.', '..', '.DS_Store'])) {
+                    $path_to   = $to . DS . $file;
+                    $path_from = $from . DS . $file;
+                    $path_backup = $backup != '' ? $backup . DS . $file : '';
+                    if (is_dir($path_to)) {
+                        self::copy_folder_option_2($path_from, $path_to, $path_backup, $echo);
+                    } else {
+                        $error = 1;
+                        $msg = 'From file not exists';
+                        $bak = null;
+
+                        if(file_exists($path_from)) {
+
+                            if($backup != '' && file_exists($path_to)) {
+                                $bak = rename($path_to, $path_backup);
+                            }
+                            
+                            if(copy($path_from, $path_to)) {
+                                $error = 0;
+                                $msg = 'Copied';
+                            } else {
+                                $msg = "Copy Error";
+                            }
+                        }
+
+                        if ($echo) {
+                            echo '<tr>';
+                            echo '<td>' . str_replace($_SERVER['DOCUMENT_ROOT'], '', $path_from) . '</td>';
+                            echo '<td>' . str_replace($_SERVER['DOCUMENT_ROOT'], '', $path_to) . '</td>';
+                            echo '<td class="text-' . ($error ? "danger" : 'success') . '">'
+                                    . ($bak != null ? ($bak ? "Backuped" : 'Backup error') : 'No backup' ) 
+                                    . ' - '
+                                    . $msg 
+                                    . '</td>';
+                            echo '</tr>';
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    static function die_response_json($response = [])
+    {
+        header('Content-type: application/json');
+
+        if (empty($response['code'])) $response['code'] = 200;
+
+        die(json_encode($response));
+    }
+
+    static function list_files()
+    {
+        $list_files = isset($_GET['list-files']) ? trim($_GET['list-files']) : '';
+        if ($list_files != '') {
+            $response = [];
+
+
+            self::die_response_json($response);
+        }
+    }
+
+    static function options($name = '', $echo = false)
+    {
+        $list = [];
+
+        if ($name == 'action') {
+            $list = [
+                'backup' => 'Backup',
+                'empty' => 'Empty',
+                'copy' => 'Copy',
+            ];
+        }
+
+        if ($echo) {
+            foreach ($list as $value => $label) {
+                $list[$value] = sprintf('<option value="%s">%s</option>', $value,  $label);
+            }
+
+            echo implode("\n", $list);
+        }
+
+        return $list;
+    }
+
+    static function verify_token($token = '')
+    {
+        global $site_token;
+
+        if(empty($site_token) || $token == '') return false;
+
+        return $site_token === $token;
+    }
+
+    static function get_token()
+    {
+        return !empty($_SESSION['token']) ? $_SESSION['token'] : '';
+    }
+
+    static function is_local()
+    {
+        return !empty($_SERVER["REMOTE_ADDR"]) && $_SERVER["REMOTE_ADDR"] == '::1';
+    }
+
+    static function load()
+    {
+        if (defined('DS') == false) {
+            define('DS', DIRECTORY_SEPARATOR);
+        }
+
+        @session_start();
+
+        global $site_token;
+
+        $site_token = !empty($_SESSION['token']) ? $_SESSION['token'] : '';
+
+        // $_SESSION['token'] = md5(uniqid(mt_rand(), true));
+
+        $_SESSION['token'] = substr(uniqid(), 7);
+
+        // self::submit();
+    }
+
+    static function submit()
+    {
+        self::list_files();
+    }
+}

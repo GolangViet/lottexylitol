@@ -1,0 +1,253 @@
+openapi: 3.0.3
+info:
+  title: Swagger Lucky - OpenAPI 3.0
+  description: Swagger Lucky
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: /api
+paths:
+  /user/signin:
+    post:
+      tags:
+        - User
+      summary: Get User Token
+      description: Get User Token
+      operationId: getUserToken
+      requestBody:
+        description: Get User Token
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserSignin'
+        required: true
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+        '401':
+          description: Invalid input
+  /user/info:
+    get:
+      tags:
+        - User
+      summary: Get User Info
+      description: This can only be done by the logged in user.
+      operationId: getUserInfo
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseUser'
+      security:
+        - jwt_token: []
+  /must-buy/verify-code:
+    post:
+      tags:
+        - Lucky
+      summary: verify Code
+      description: This can only be done by the logged in user.
+      operationId: verifyCode
+      requestBody:
+        description: Filter
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyCode'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - jwt_token: []
+  /must-buy/fill-blank:
+    post:
+      tags:
+        - Lucky
+      summary: fill blank
+      description: This can only be done by the logged in user.
+      operationId: fillBlank
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - jwt_token: []
+  /must-buy/lucky:
+    post:
+      tags:
+        - Lucky
+      summary: lucky
+      description: This can only be done by the logged in user.
+      operationId: lucky
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - jwt_token: []
+  /must-buy/xexindentay:
+    post:
+      tags:
+        - Lucky
+      summary: lucky
+      description: This can only be done by the logged in user.
+      operationId: lucky
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - jwt_token: []
+  /history/must-buy:
+    get:
+      tags:
+        - Lucky
+      summary: Get lucky history
+      description: This can only be done by the logged in user.
+      operationId: getLuckyHistory
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseList'
+      security:
+        - jwt_token: []
+components:
+  schemas:
+    User:
+      required:
+        - name
+        - email
+        - phone
+        - address
+        - city
+        - gender
+        - age
+      type: object
+      properties:
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@email.com
+        phone:
+          type: string
+          example: '0931231234'
+        address:
+          type: string
+          example: 123 Street
+        city:
+          type: string
+          example: HCM
+        gender:
+          type: string
+          example: male
+        age:
+          type: number
+          example: 18
+    UserSignin:
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        username:
+          type: string
+          example: '0901234567'
+          description: email or phone
+        password:
+          type: string
+          example: '2mzaksEzr3dhQX4lmEF3'
+    VerifyCode:
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: ABCODE
+    Response:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        error:
+          type: string
+          example: errors
+        message:
+          type: string
+          description: message
+    ResponseList:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        items:
+          type: string
+          example: list items
+        message:
+          type: string
+          description: message
+    ResponseToken:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        iat:
+          type: string
+          example: time
+        expires_in:
+          type: string
+          example: expires time
+        jwt_token:
+          type: string
+          description: code
+    ResponseUser:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        user:
+          schema:
+            $ref: '#/components/schemas/User'
+        message:
+          type: string
+          description: message
+  securitySchemes:
+    jwt_token:
+      type: apiKey
+      name: token
+      in: header

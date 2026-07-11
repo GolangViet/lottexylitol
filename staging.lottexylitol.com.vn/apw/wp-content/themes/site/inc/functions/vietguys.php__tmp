@@ -1,0 +1,167 @@
+<?php
+
+/**
+ * Vietguys SMS
+ */
+function site_vietguys_option($name = '', $default = '')
+{
+    // Refresh Token (Expired 2026-01-03 15:13:24)
+
+    $option = array(
+        "username" => 'xylitol_smscskh', // "xylitol_topup",
+        "refresh_token" => "5ZMFDFxw-Cakv3yI00gArQj9M3j2ArohgscHQ0H5NPogUfSRTxAIP2CMWWbO4rF_uqXyZPg8-LLXPBzrQGVIitRBNXCHG9DNzwBZFhtc7zrRJw4WhqdVELoKT6WMbQIo"
+    );
+
+    $setting = get_option('vietguys_setting');
+    if (is_array($setting)) {
+        $option = array_merge($option, $setting);
+    }
+
+    if ($name != '') {
+        if (isset($option[$name])) {
+            return $option[$name];
+        }
+
+        return $default;
+    }
+
+    return $option;
+}
+
+/**
+ * https://developers.vietguys.biz/#cskh
+ */
+function site_vietguys_api_send($phone = '', $code = '')
+{
+    $data = array(
+        'from' => 'XYLITOL',
+        'u' => site_vietguys_option('username'),
+        'pwd' => site_vietguys_get_access_token(),
+        'phone' => $phone,
+        'sms' => sprintf('[XYLITOL] Ma xac minh cua ban tai https://lottexylitol.com.vn/ la.%s. Vui long khong chia se ma voi bat ky ai.', $code),
+        'bid' => 'otp_' . current_time('timestamp'),
+        'pid' => 'otp',
+        'type' => '0',
+        'json' => '1',
+    );
+
+    // $response = site_curl_send('https://cloudsms4.vietguys.biz:4438/api/index.php', $data, [], '');
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://cloudsms4.vietguys.biz:4438/api/index.php",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_POSTFIELDS => $data,
+    ));
+
+    $response = curl_exec($curl);
+
+    if(is_dir($folder = dirname(ABSPATH) . '/test')) {
+        file_put_contents($folder. '/vietguys-send-' . current_time('timestamp') . '.json', json_encode([
+            'request' => $data,
+            'response' => $response,
+        ]));
+    }
+
+    curl_close($curl);
+
+    return $response;
+}
+
+/**
+ *  
+ */
+function site_vietguys_api_refresh_token()
+{
+    $data = array(
+        "username" => site_vietguys_option('username'),
+        "type" => "refresh_token"
+    );
+
+    $header = array(
+        'Refresh-Token: ' . site_vietguys_option('refresh_token'),
+        'Content-Type: application/json'
+    );
+
+    // $response = site_curl_send('https://api-v2.vietguys.biz:4438/token/v1/refresh', json_encode($data), $header, '');
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://api-v2.vietguys.biz:4438/token/v1/refresh',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => json_encode($data),
+        CURLOPT_HTTPHEADER => $header,
+    ));
+
+    $response = curl_exec($curl);
+
+    // file_put_contents(ABSPATH . '/vietguys-refresh-' . current_time('timestamp') . '.json', json_encode($data) . "\n\n". json_encode($header) . "\n\n". $response);
+
+    if(is_dir($folder = dirname(ABSPATH) . '/test')) {
+        file_put_contents($folder . '/vietguys-refresh-' . current_time('timestamp') . '.json', json_encode([
+            'request' => $data,
+            'header' => $header,
+            'response' => $response,
+        ]));
+    }
+
+    curl_close($curl);
+
+    if (is_string($response) && $response != '') {
+        $response = json_decode($response, true);
+
+        if (isset($response['message']) && $response['message'] == "Success") {
+            return $response['data'];
+        }
+    }
+
+    return [];
+}
+
+/**
+ *  
+ */
+function site_vietguys_get_access_token()
+{
+    $access_token = '';
+
+    $setting = get_option('vietguys_setting');
+    if (is_array($setting) && isset($setting['expired_at'])) {
+        $expired_at = intval($setting['expired_at'] / 1000);
+
+        if ($expired_at > current_time('U')) {
+            $access_token = $setting['access_token'];
+        }
+    }
+
+    if ($access_token == '') {
+        $data = site_vietguys_api_refresh_token();
+
+        if (isset($data['access_token'])) {
+            update_option('vietguys_setting', $data);
+
+            $access_token = $data['access_token'];
+        }
+    }
+
+    return $access_token;
+}
+
+function site_vietguys_random_id()
+{
+    return date('YmdHis') . mt_rand(1000, 9999) . uniqid();
+}

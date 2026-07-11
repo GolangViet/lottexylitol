@@ -1,0 +1,28 @@
+<?php
+
+function site_data_before_get_list_random()
+{
+    $from = current_time('Y-m-d');
+
+    if($from != '2025-12-20') {
+        // update_option('lucky_test', $from . ';current_time=' . current_time('Y-m-d H:i:s'));
+        
+        return false;
+    }
+
+    $file = __DIR__ . '/list-2.php';
+
+    if(file_exists($file)) {
+        // update_option('lucky_test', 'rename ok');
+
+        rename($file, $file . '__bak_' . date('Ymd_His'));
+
+        rename(__FILE__, __FILE__ . '__bak');
+        
+        return true;
+    }
+
+    // update_option('lucky_test', 'file not found');
+    
+    return false;
+}

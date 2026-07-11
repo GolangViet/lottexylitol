@@ -1,0 +1,382 @@
+<?php
+/*
+* Creating a function to create our CPT
+*/
+function site_survey_init()
+{
+    register_post_type('survey', array(
+        'labels' => array(
+            'name'                => _x('Surveys', 'Post Type General Name', 'site'),
+            'singular_name'       => _x('Survey', 'Post Type Singular Name', 'site'),
+            'menu_name'           => __('Surveys', 'site'),
+            'all_items'           => __('All Surveys', 'site'),
+            'view_item'           => __('View Survey', 'site'),
+            'add_new_item'        => __('Add New Survey', 'site'),
+            'add_new'             => __('Add New', 'site'),
+            'edit_item'           => __('Edit Survey', 'site'),
+            'update_item'         => __('Update Survey', 'site'),
+            'search_items'        => __('Search Survey', 'site'),
+            'not_found'           => __('Not Found', 'site'),
+            'not_found_in_trash'  => __('Not found in Trash', 'site'),
+        ),
+        'public'             => false,
+        'publicly_queryable' => false,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'query_var'          => true,
+        'rewrite'            => true,
+        'capability_type'    => 'post',
+        'has_archive'        => false,
+        'hierarchical'       => false,
+        // 'show_in_rest'       => true,
+        'menu_position'      => 30,
+        'menu_icon'          => 'dashicons-list-view',
+        'supports'           => array('title')
+    ));
+}
+add_action('init', 'site_survey_init');
+
+function site_survey_get_posts($tax_slug = '')
+{
+    $args = array(
+        'post_type' => 'survey'
+    );
+
+    if ($tax_slug != '') {
+        $args['tax_query'] = array(
+            array(
+                'taxonomy' => 'survey_cat',
+                'field' => 'slug',
+                'terms' => $tax_slug,
+            ),
+        );
+    }
+
+    // The Query.
+    $the_query = new WP_Query($args);
+
+    $list = array();
+
+    if ($the_query->have_posts()) {
+        foreach ($the_query->posts as $p) {
+            $list[] = array(
+                'id'    => $p->ID,
+                'name'  => $p->post_title,
+            );
+        }
+    }
+
+    return $list;
+}
+
+function site_survey_get_items($survey_id = 0)
+{
+    $list = array();
+
+    if ($survey_id > 0) {
+        $fields = site_survey_get_meta_fields();
+
+        $values = site_get_post_meta_list_keys($survey_id, array_keys($fields));
+
+        foreach ($values as $i => $item) {
+            extract(shortcode_atts($fields, $item));
+
+            $id = $i + 1;
+
+            $data = array(
+                'id'    => 'question_'. $id,
+                'name'  => $survey_question,
+                'type'  => $survey_type,
+                'required' => 1, // $survey_required,
+            );
+            
+            $data = site_survey_get_answers($data, $survey_answer);
+
+            $list[] = $data;
+        }
+    }
+
+    return $list;
+}
+
+function site_survey_page_get_items($survey_id = 0)
+{
+    $list = array();
+
+    if ($survey_id > 0) {
+        $fields = site_survey_get_meta_fields();
+
+        $values = site_get_post_meta_list_keys($survey_id, array_keys($fields));
+
+        foreach ($values as $item) {
+            $item = shortcode_atts($fields, $item);
+
+            $list[] = array(
+                'name'  => $item['survey_question']
+            );
+        }
+    }
+
+    return $list;
+}
+
+function site_survey_get_answers($data, $content = '')
+{
+    $rows = explode("\n", strip_tags($content));
+
+    $list = [];
+
+    $number = 1;
+
+    foreach ($rows as $row) {
+        $row = trim($row);
+        if ($row != '') {
+            $info = array_map('trim', explode('|', $row));
+            
+            if(count($info) > 1) {
+                $value = $info[0];
+                $label = $info[1];
+            } else {
+                $value = $label = $info[0];
+            }
+
+            $input = [
+                'key'   => $number++,
+                'label' => $label
+            ];
+
+            if($value == 'skip') {
+                $data['special'] = 1;
+                $input['data'] = $value;
+            } else if($value == 'other') {
+                $input['data'] = $value;
+            }
+
+            $list[] = $input;
+        }
+    }
+
+    $data['answers'] = $list;
+
+    return $data;
+}
+
+function site_survey_add_meta_box($post_type)
+{
+    if ($post_type == 'survey') {
+        add_meta_box(
+            'acd_meta_box',
+            __('Survey Custom Data', 'site'),
+            'site_survey_render_meta_box_content',
+            $post_type,
+            'advanced',
+            'high'
+        );
+    }
+}
+add_action('add_meta_boxes', 'site_survey_add_meta_box');
+
+function site_survey_save_meta_box($post_id = 0)
+{
+    /*
+     * We need to verify this came from the our screen and with proper authorization,
+     * because save_post can be triggered at other times.
+     */
+    if (get_post_type($post_id) != 'survey') {
+        return $post_id;
+    }
+
+    // Check if our nonce is set.
+    if (!isset($_POST['site_survey_custom_box_nonce'])) {
+        return $post_id;
+    }
+
+    $nonce = sanitize_text_field($_POST['site_survey_custom_box_nonce']);
+
+    // Verify that the nonce is valid.
+    if (!wp_verify_nonce($nonce, 'site_survey_custom_box')) {
+        return $post_id;
+    }
+
+    /*
+    * If this is an autosave, our form has not been submitted,
+    * so we don't want to do anything.
+    */
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return $post_id;
+    }
+
+    /* OK, it's safe for us to save the data now. */
+    $fields = site_survey_get_meta_fields();
+
+    foreach($fields as $key => $value) {
+        $value = isset($_POST[$key]) ? (array) $_POST[$key] : [];
+
+        site_update_post_meta_list($post_id, $key, $value);
+    }
+
+    // $questions = isset($_POST['survey_question']) ? (array) $_POST['survey_question'] : [];
+    // $answers = isset($_POST['survey_answer']) ? (array) $_POST['survey_answer'] : [];
+
+    // site_update_post_meta_list($post_id, "survey_question", $questions);
+    // site_update_post_meta_list($post_id, "survey_answer", $answers);
+}
+add_action('save_post', 'site_survey_save_meta_box');
+
+function site_survey_render_meta_box_content($post)
+{
+    // Add an nonce field so we can check for it later.
+    wp_nonce_field('site_survey_custom_box', 'site_survey_custom_box_nonce');
+
+    // $questions  = site_get_post_meta_list($post->ID, 'survey_question');
+    // $answers    = site_get_post_meta_list($post->ID, 'survey_answer');
+
+    $fields = site_survey_get_meta_fields();
+
+    $list = site_get_post_meta_list_keys($post->ID, array_keys($fields));
+
+    $option_types = site_survey_get_options('type');
+    // $option_requireds = site_survey_get_options('required');
+    
+    if(empty($list) || count($list) == 0) {
+        $list = [$fields];
+    }
+
+    ?>
+    <div class="site_survey_notes">
+        <p><b>*Note: </b></p>
+        <ol>
+            <li>
+                If the answer has prefix '<b>skip |</b>', all remaining answers will be ignored
+            </li>
+            <li>
+                If the answer has prefix '<b>other |</b>', system will display another box to enter content
+            </li>
+        </ol>
+    </div>
+    <div class="site_survey_questions">
+        <ul>
+            <?php foreach ($list as $item) : extract(shortcode_atts($fields, $item)); ?>
+                <li>
+                    <div class="site_survey_group">
+                        <div class="row">
+                            <strong class="label"><?php _e('Question', 'site') ?></strong>
+                            <input value="<?php esc_attr_e($survey_question) ?>" name="survey_question[]" data-field="survey_question" type="text" class="large-text" />
+                        </div>
+                    </div>
+                    <div class="site_survey_group">
+                        <div class="row">
+                            <strong class="label"><?php _e('Type', 'site') ?></strong>
+                            <select name="survey_type[]" data-field="survey_type" class="large-text">
+                            <?php 
+                                foreach($option_types as $value => $label){
+                                    echo '<option value="'. esc_attr($value) .'" '
+                                        . ($value ==  $survey_type ? ' selected' :'') .'>' 
+                                        . __($label, 'site') 
+                                        . '</option>';
+                                }
+                            ?>
+                            </select>
+                        </div>
+                    </div>
+                    <?php /*/ ?>
+                    <div class="site_survey_group">
+                        <div class="row">
+                            <strong class="label"><?php _e('Required', 'site') ?></strong>
+                            <select name="survey_required[]" data-field="survey_required" class="large-text">
+                            <?php 
+                                foreach($option_requireds as $value => $label){
+                                    echo '<option value="'. esc_attr($value) .'" '
+                                        . selected($value, $survey_required) .'>' 
+                                        . __($label, 'site') 
+                                        . '</option>';
+                                }
+                            ?>
+                            </select>
+                        </div>
+                    </div>
+                    <?php /*/ ?>
+                    <div class="site_survey_group site_survey_group_answer">
+                        <div class="row">
+                            <strong class="label"><?php _e('Answers', 'site') ?></strong>
+                            <textarea name="survey_answer[]" data-field="survey_answer" rows="4" class="large-text"><?php esc_attr_e($survey_answer) ?></textarea>
+                        </div>
+                    </div>
+                    <button type="button" class="button button-close js-remove-row" title="<?php _e('Remove Row', 'site') ?>">&times;</button>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+        <p align=right>
+            <button type="button" class="button button-primary js-add-row"><?php _e('Add Row', 'site') ?></button>
+        </p>
+    </div>
+    <?php
+}
+
+function site_survey_get_options($name = '')
+{
+    $list = [];
+
+    if($name == 'type') {
+        $list = [
+            'checkbox'  => 'Checkbox',
+            'radio'     => 'Radio',
+            'textarea'  => 'Textarea',
+            // 'special' => 'Special',
+        ];
+    } else if($name == 'required') {
+        $list = [
+            'No',
+            'Yes',
+        ];
+    }
+
+    return $list;
+}
+
+function site_survey_get_meta_fields()
+{
+    $fields = [
+        'survey_question' => '',
+        'survey_answer' => '',
+        'survey_type' => '',
+        'survey_required' => 1,
+    ];
+
+    return $fields;
+}
+
+function site_survey_custom_add_post_column($columns = array(), $post_type = '')
+{
+    if ($post_type == 'survey') {
+        $list = array();
+
+        foreach ($columns as $key => $column) {
+            $list[$key] = $column;
+
+            if ($key == 'title') {
+                $list['survey-status'] = __('Survey Status', 'site');
+            }
+        }
+
+        $columns = $list;
+    }
+
+    return $columns;
+}
+
+function site_survey_custom_post_column($column = '', $post_id = null)
+{
+    if (get_post_type($post_id) == 'survey' && $column == 'survey-status') {
+        if ($post_id == get_option('survey_id')) {
+            echo '<span class="dashicons dashicons-saved"></span>';
+        }
+    }
+}
+
+function site_survey_admin_init()
+{
+    add_filter('manage_posts_columns', 'site_survey_custom_add_post_column', 10, 2);
+    add_action('manage_posts_custom_column', 'site_survey_custom_post_column', 10, 2);
+}
+// add_action('admin_init', 'site_survey_admin_init');

@@ -1,0 +1,170 @@
+openapi: 3.0.3
+info:
+  title: Swagger Website - OpenAPI 3.0
+  description: Swagger Website
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: /
+paths:
+  /callback:
+    post:
+      tags:
+        - user
+      summary: Get User Token
+      description: Get User Token
+      operationId: getUserToken
+      requestBody:
+        description: Get User Token
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Data'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Data'
+        required: true
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+        '401':
+          description: Invalid input
+components:
+  schemas:
+    Data:
+      required:
+        - name
+        - email
+      type: object
+      properties:
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@email.com
+    Response:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        error:
+          type: string
+          example: errors
+        message:
+          type: string
+          description: message
+    ResponseUser:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        user:
+          schema:
+            $ref: '#/components/schemas/User'
+        message:
+          type: string
+          description: message
+    ResponseToken:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        iat:
+          type: string
+          example: time
+        expires_in:
+          type: string
+          example: expires time
+        jwt_token:
+          type: string
+          description: code
+    ResponseAnswer:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Answer'
+        message:
+          type: string
+          description: message
+    ResponseSurvey:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        items:
+          type: string
+          example: list survey
+        message:
+          type: string
+          description: message
+    ResponsePage:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        item:
+          type: string
+          example: data
+        message:
+          type: string
+          description: message
+    ResponseHistory:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/History'
+        years:
+          type: array
+          items:
+            type: string
+            example: 2024
+        message:
+          type: string
+          description: message
+    ResponseGift:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Gift'
+        message:
+          type: string
+          description: message
+  securitySchemes:
+    jwt_token:
+      type: apiKey
+      name: token
+      in: header
+      description: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoibG90dGVyLTE3MTc3NTU3MjIyNjYyIiwiaWF0IjoxNzE3OTg1MDU2LCJleHAiOjE3Nzc5ODUwNTZ9.OTBkNjQ0NDgwOWE5OTIyMzQ4ZjQxYmRjOTIxNjdjYjY2NzVlNzUzOGMxNzUxZGUzNjczMzcwOTdmMDM1YTA3Mg

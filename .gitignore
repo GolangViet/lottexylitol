@@ -1,0 +1,8 @@
+.env
+.env.backup
+/.idea
+/.vscode
+/docker/mysql/database
+/docker/mysql/ib_buffer_pool
+/docker/postgres/postgres-data
+*.DS_Store

@@ -1,0 +1,1623 @@
+<?php
+defined('ABSPATH') or die;
+
+/*************************** LOAD THE BASE CLASS *******************************
+ *******************************************************************************
+ * The WP_List_Table class isn't automatically available to plugins, so we need
+ * to check if it's available and load it if necessary. In this tutorial, we are
+ * going to use the WP_List_Table class directly from WordPress core.
+ *
+ * IMPORTANT:
+ * Please note that the WP_List_Table class technically isn't an official API,
+ * and it could change at some point in the distant future. Should that happen,
+ * I will update this plugin with the most current techniques for your reference
+ * immediately.
+ *
+ * If you are really worried about future compatibility, you can make a copy of
+ * the WP_List_Table class (file path is shown just below) to use and distribute
+ * with your plugins. If you do that, just remember to change the name of the
+ * class to avoid conflicts with core.
+ *
+ * Since I will be keeping this tutorial up-to-date for the foreseeable future,
+ * I am going to work with the copy of the class provided in WordPress core.
+ */
+if (!class_exists('WP_List_Table')) {
+    require_once(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
+}
+
+/************************** CREATE A PACKAGE CLASS *****************************
+ *******************************************************************************
+ * Create a new list table package that extends the core WP_Users_List_Table class.
+ * WP_Users_List_Table contains most of the framework for generating the table, but we
+ * need to define and override some methods so that our data can be displayed
+ * exactly the way we need it to be.
+ * 
+ * To display this example on a page, you will first need to instantiate the class,
+ * then call $yourInstance->prepare_items() to handle any data manipulation, then
+ * finally call $yourInstance->display() to render the table to the page.
+ * 
+ * Our theme for this list table is going to be movies.
+ */
+class Site_Lucky_List_Table extends WP_List_Table
+{
+    protected $tbl_name = 'lucky_results';
+
+    protected $page_action = '';
+
+    protected $list_type = '';
+
+    protected $list_per_page = null;
+
+    protected $list_row = 1;
+
+    /** ************************************************************************
+     * REQUIRED. Set up a constructor that references the parent constructor. We 
+     * use the parent reference to set some default configs.
+     ***************************************************************************/
+    function __construct()
+    {
+        $action = isset($_REQUEST['action']) ? sanitize_text_field($_REQUEST['action']) : '';
+        if(in_array($action, ['status', 'statistic'])) {
+            $this->page_action = $action;
+
+            if($this->page_action == 'status') {
+                $this->tbl_name = 'usermeta';
+            }
+        }
+        
+        //Set parent defaults
+        parent::__construct(array(
+            'singular'  => 'customer',     //singular name of the listed records
+            'plural'    => 'result',    //plural name of the listed records
+            'ajax'      => false        //does this table support ajax?
+        ));
+    }
+
+    function set_var($key = '', $value = '')
+    {
+        if(isset($this->$key)) {
+            $this->$key = $value;
+        }
+    }
+
+    /** ************************************************************************
+     * Recommended. This method is called when the parent class can't find a method
+     * specifically build for a given column. Generally, it's recommended to include
+     * one method for each column you want to render, keeping your package class
+     * neat and organized. For example, if the class needs to process a column
+     * named 'title', it would first see if a method named $this->column_title() 
+     * exists - if it does, that method will be used. If it doesn't, this one will
+     * be used. Generally, you should try to use custom column methods as much as 
+     * possible. 
+     * 
+     * Since we have defined a column_title() method later on, this method doesn't
+     * need to concern itself with any column with a name of 'title'. Instead, it
+     * needs to handle everything else.
+     * 
+     * For more detailed insight into how columns are handled, take a look at 
+     * WP_List_Table::single_row_columns()
+     * 
+     * @param array $item A singular item (one full row's worth of data)
+     * @param array $column_name The name/slug of the column to be processed
+     * @return string Text or HTML to be placed insIDe the column <td>
+     **************************************************************************/
+    function column_default($item = [], $column_name = '', $type = '')
+    {
+        $args = wp_unslash($_GET);
+
+        switch ($column_name) {
+            case 'id':
+                if($this->page_action == 'status' || $this->page_action == 'statistic') {
+                    $value = isset($item['user_id']) ? $item['user_id'] : 0;
+                } else {
+                    if($this->list_per_page == null) {
+                        $this->list_per_page = $this->get_current_user_screen_meta('per_page', 20);
+                    }
+
+                    $paged = isset($args['paged']) ? intval($args['paged']) - 1 : 0;
+                    if($paged < 0) $paged = 0;
+
+                    // $value = isset($item['id']) ? $item['id'] : 0;
+
+                    $value = ($paged * $this->list_per_page) + $this->list_row++;
+                }
+
+                return $value;
+            case 'user_name':
+                if(empty($item[$column_name])) {
+                    $user_info = get_userdata($item['user_id']);
+
+                    $item[$column_name] = isset($user_info->display_name) ? $user_info->display_name : '';
+                }
+
+                if($this->page_action == 'status' && $type == '') {
+                    return sprintf('<a href="%s">%s</a>', add_query_arg(array_merge($args, ['id' => $item['user_id'],'action' => 'status'])), $item[$column_name]);
+                }
+
+                return $item[$column_name];
+            case 'email':
+                $user_info = get_userdata($item['user_id']);
+                return isset($user_info->user_email) && isset($item[$column_name]) ? $item[$column_name] : 'User Deleted';
+            case 'user_gender':
+                if(empty($item[$column_name])) {
+                    $item[$column_name] = site_user_get_options('gender', get_user_meta($item['user_id'], 'gender', true));
+                }
+                return $item[$column_name];
+            case 'user_address':
+                if(empty($item[$column_name])) {
+                    $item[$column_name] = get_user_meta($item['user_id'], 'address', true) . ', ' . get_user_meta($item['user_id'], 'city', true);
+                }
+                return $item[$column_name];
+            case 'count_results':
+                $value = 0;
+
+                if(isset($item['user_id'])) {
+                    $lucky = Lucky_Lotte::instance();
+
+                    $value = $lucky->count_results(['user_id' => $item['user_id']]);
+                }
+
+                return $value;
+            case 'meta_lucky_status':
+                $value = '';
+
+                if(isset($item['meta_value'])) {
+                    $lucky = Lucky_Lotte::instance();
+
+                    $value = $lucky->get_statuses($item['meta_value']);
+                }
+
+                return $value;
+            default:
+                return isset($item[$column_name]) ? $item[$column_name] : ''; //Show the whole array for troubleshooting purposes
+        }
+    }
+
+
+    /** ************************************************************************
+     * Recommended. This is a custom column method and is responsible for what
+     * is rendered in any column with a name/slug of 'title'. Every time the class
+     * needs to render a column, it first looks for a method named 
+     * column_{$column_title} - if it exists, that method is run. If it doesn't
+     * exist, column_default() is called instead.
+     * 
+     * This example also illustrates how to implement rollover actions. Actions
+     * should be an associative array formatted as 'slug'=>'link html' - and you
+     * will need to generate the URLs yourself. You could even ensure the links
+     * 
+     * 
+     * @see WP_List_Table::::single_row_columns()
+     * @param array $item A singular item (one full row's worth of data)
+     * @return string Text to be placed inside the column <td> (movie title only)
+     **************************************************************************/
+    function column_title($item = [])
+    {
+        $args = $_GET;
+
+        $args['id'] = $item['id'];
+
+        //Build row actions
+        $actions = array(
+            'detail' => '<a href="' . add_query_arg(array_merge($args, ['action' => 'detail'])) . '">' . __('Detail', 'site') . '</a>',
+            // 'delete' => '<a href="'. add_query_arg(array_merge($args,['action'=>'delete', 'nonce' => wp_create_nonce('delete-nonce')])).'">'.__('Delete','site').'</a>',
+        );
+
+        //Return the title contents
+        return sprintf(
+            '%1$s %2$s',
+            /*$1%s*/
+            $item['post_title'],
+            /*$2%s*/
+            $this->row_actions($actions)
+        );
+    }
+
+
+    /** ************************************************************************
+     * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
+     * is given special treatment when columns are processed. It ALWAYS needs to
+     * have it's own method.
+     * 
+     * @see WP_List_Table::::single_row_columns()
+     * @param array $item A singular item (one full row's worth of data)
+     * @return string Text to be placed insIDe the column <td> (movie title only)
+     **************************************************************************/
+    function column_cb($item)
+    {
+        return sprintf(
+            '<input type="checkbox" name="%1$s[]" value="%2$s" />',
+            /*$1%s*/
+            $this->_args['singular'],  //Let's simply repurpose the table's singular label ("movie")
+            /*$2%s*/
+            $item['id']                //The value of the checkbox should be the record's ID
+        );
+    }
+
+
+    /** ************************************************************************
+     * REQUIRED! This method dictates the table's columns and titles. This should
+     * return an array where the key is the column slug (and class) and the value 
+     * is the column's title text. If you need a checkbox for bulk actions, refer
+     * to the $columns array below.
+     * 
+     * The 'cb' column is treated differently than the rest. If including a checkbox
+     * column in your table you must create a column_cb() method. If you don't need
+     * bulk actions or checkboxes, simply leave the 'cb' entry out of your array.
+     * 
+     * @see WP_List_Table::::single_row_columns()
+     * @return array An associative array containing column information: 'slugs'=>'Visible Titles'
+     **************************************************************************/
+    function get_columns()
+    {
+        if($this->page_action == 'status') {
+            $columns = array(
+                'id'            => 'User ID',
+                // 'user_id'       => 'ID',
+                'user_name'     => 'User Name',
+            );
+
+            if($this->list_type == 'status-pending') {
+                $columns['meta_lucky_status'] = 'Pending';
+            } else {
+                $columns['status'] = '';
+            }
+        } else if($this->page_action == 'statistic') {
+            $columns = array(
+                'user_id'       => 'User ID',
+                'user_name'     => 'Name',
+                'total'         => 'Số lần', // count_results
+            );
+        } else {
+            $columns = array(
+                'cb'            => '<input type="checkbox" />', //Render a checkbox instead of text
+                'id'            => '#',
+                'created'       => 'Created',
+                'user_id'       => 'User ID',
+                'user_name'     => 'Name',
+                'user_phone'    => 'Phone',
+                'user_email'    => 'Email',
+                'user_address'  => 'Address',
+                'user_age'      => 'Age',
+                'code'          => 'Lucky Code',
+                'name'          => 'Prize',
+                
+                // 'user_code'     => 'User Code',
+                // 'user_gender'   => 'Gender',
+                // 'utm'           => 'UTM',
+            );
+        }
+
+        return $columns;
+    }
+
+
+    /** ************************************************************************
+     * Optional. If you want one or more columns to be sortable (ASC/DESC toggle), 
+     * you will need to register it here. This should return an array where the 
+     * key is the column that needs to be sortable, and the value is db column to 
+     * sort by. Often, the key and value will be the same, but this is not always
+     * the case (as the value is a column name from the database, not the list table).
+     * 
+     * This method merely defines which columns should be sortable and makes them
+     * clickable - it does not handle the actual sorting. You still need to detect
+     * the ORDERBY and ORDER querystring variables within prepare_items() and sort
+     * your data accordingly (usually by modifying your query).
+     * 
+     * @return array An associative array containing all the columns that should be sortable: 'slugs'=>array('data_values',bool)
+     **************************************************************************/
+    function get_sortable_columns()
+    {
+        //true means it's already sorted
+        $sortable_columns = array(
+            // 'ID'        => array('ID', false),
+            // 'name'      => array('name', false),
+            // 'created'   => array('created', false)
+        );
+
+        return $sortable_columns;
+    }
+
+
+    /** ************************************************************************
+     * Optional. If you need to include bulk actions in your list table, this is
+     * the place to define them. Bulk actions are an associative array in the format
+     * 'slug'=>'Visible Title'
+     * 
+     * If this method returns an empty value, no bulk action will be rendered. If
+     * you specify any bulk actions, the bulk actions box will be rendered with
+     * the table automatically on display().
+     * 
+     * Also note that list tables are not automatically wrapped in <form> elements,
+     * so you will need to create those manually in order for bulk actions to function.
+     * 
+     * @return array An associative array containing all the bulk actions: 'slugs'=>'Visible Titles'
+     **************************************************************************/
+    function get_bulk_actions()
+    {
+        $actions = array(
+            // 'delete'	=> 'Delete',
+        );
+        return $actions;
+    }
+
+
+    /** ************************************************************************
+     * Optional. You can handle your bulk actions anywhere or anyhow you prefer.
+     * For this example package, we will handle it in the class to keep things
+     * clean and organized.
+     * 
+     * @see $this->prepare_items()
+     **************************************************************************/
+    function process_bulk_action()
+    {
+        $class = 'notice-success';
+        $message = '';
+        $action = strtolower(str_replace(' ', '', $this->current_action()));
+
+        //Detect when a bulk action is being triggered...
+        if ('delete' == $action) {
+            // nonce
+            $nonce = isset($_GET['nonce']) ? sanitize_text_field($_GET['nonce']) : '';
+            if ($nonce == '' || !wp_verify_nonce($nonce, 'delete-nonce')) {
+                $class = 'notice-warning';
+                $message = 'Delete token not verify!';
+            } else if ($this->delete_item() ==  false) {
+                $class = 'notice-error';
+                $message = 'Data NULL';
+            } else {
+                $message = 'Data deleted.';
+            }
+        }
+
+        if ($message != '') {
+            echo '<div id="message" class="notice ' . esc_attr($class) . ' is-dismissible">
+				' . __($message, 'site') . '<button type="button" class="notice-dismiss"><span class="screen-reader-text">' . __('Dismiss this notice.') . '</span></button>
+			</div>';
+        }
+    }
+
+
+    /** ************************************************************************
+     * REQUIRED! This is where you prepare your data for display. This method will
+     * usually be used to query the database, sort and filter the data, and generally
+     * get it ready to be displayed. At a minimum, we should set $this->items and
+     * $this->set_pagination_args(), although the following properties and methods
+     * are frequently interacted with here...
+     * 
+     * @global WPDB $wpdb
+     * @uses $this->_column_headers
+     * @uses $this->items
+     * @uses $this->get_columns()
+     * @uses $this->get_sortable_columns()
+     * @uses $this->get_pagenum()
+     * @uses $this->set_pagination_args()
+     **************************************************************************/
+    function prepare_items()
+    {
+        global $wpdb; //This is used only if making any database queries
+
+        /**
+         * First, lets decide how many records per page to show
+         */
+        $per_page = $this->get_current_user_screen_meta('per_page', 20);
+
+        if (isset($_POST['per_page']) && intval($_POST['per_page']) > 0) {
+            $per_page = (int) $_POST['per_page'];
+            $this->update_current_user_screen_meta('per_page', $per_page);
+        }
+
+        /**
+         * REQUIRED. Now we need to define our column headers. This includes a complete
+         * array of columns to be displayed (slugs & titles), a list of columns
+         * to keep hidden, and a list of columns that are sortable. Each of these
+         * can be defined in another method (as we've done here) before being
+         * used to build the value for our _column_headers property.
+         */
+        $columns = $this->get_columns();
+        $where = '';
+        $hidden = array();
+        $sortable = $this->get_sortable_columns();
+        $group_by = '';
+
+        /**
+         * REQUIRED. Finally, we build an array to be used by the class for column 
+         * headers. The $this->_column_headers property takes an array which contains
+         * 3 other arrays. One for all columns, one for hidden columns, and one
+         * for sortable columns.
+         */
+        $this->_column_headers = array($columns, $hidden, $sortable);
+
+        /**
+         * Optional. You can handle your bulk actions however you see fit. In this
+         * case, we'll handle them within our package just to keep things clean.
+         */
+        $this->process_bulk_action();
+
+        /***********************************************************************
+         * ---------------------------------------------------------------------
+         * vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+         * 
+         * In a real-world situation, this is where you would place your query.
+         *
+         * For information on making queries in WordPress, see this Codex entry:
+         * http://codex.wordpress.org/Class_Reference/wpdb
+         * 
+         * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+         * ---------------------------------------------------------------------
+         **********************************************************************/
+        $table = $wpdb->prefix . $this->tbl_name;
+
+        $search = isset($_REQUEST['s']) ? sanitize_text_field($_REQUEST['s']) : ''; //If no sort, default to title
+
+        $where = '';
+
+        $where_search = '';
+
+        if ($search != '') {
+            $text_like = '%' . $wpdb->esc_like($search) . '%';
+
+            $where_search = $wpdb->prepare(" AND (`code` LIKE %s OR `user_name` LIKE %s OR `user_email` LIKE %s OR `user_phone` LIKE %s) ", $text_like, $text_like, $text_like, $text_like);
+        }
+
+        // user_id [1] is [admin]
+
+        if($this->page_action == 'status') {
+            if (isset($text_like)) {
+                $where = $wpdb->prepare(" AS um JOIN %i AS u ON u.`ID` = um.`user_id` ", $wpdb->users);
+            }
+
+            $where .= $wpdb->prepare(" WHERE `user_id` != 1 AND meta_key = %s ", 'lucky_status');
+            
+            if($this->list_type == 'status-pending') {
+                $where .= $wpdb->prepare(" AND meta_value != %s ", 'completed');
+            }
+
+            if (isset($text_like)) {
+                $where .= $wpdb->prepare(" AND (`display_name` LIKE %s OR `user_email` LIKE %s OR `user_nicename` LIKE %s) ", $text_like, $text_like, $text_like);
+            }
+
+            // $group_by = ' GROUP BY user_id';
+        } else if($this->page_action == 'statistic') {
+            $where = " WHERE `user_id` != 1 " . $where_search;
+        } else {
+            $where = " WHERE `user_id` != 1 " . $where_search;
+
+            $gift_id = isset($_GET['gift_id']) ? intval($_GET['gift_id']) : 0;
+            if($gift_id > 0) {
+                $where .= $wpdb->prepare(" AND `gift_id` = %d ", $gift_id);
+            }
+        }
+
+        /**
+         * REQUIRED for pagination. Let's figure out what page the user is currently 
+         * looking at. We'll need this later, so you should always include it in 
+         * your own package classes.
+         */
+        $current_page = (int) $this->get_pagenum();
+
+        /**
+         * REQUIRED for pagination. Let's check how many items are in our data array. 
+         * In real-world use, this would be the total number of items in your database, 
+         * without filtering. We'll need this later, so you should always include it 
+         * in your own package classes.
+         */
+
+        if($this->page_action == 'statistic') {
+            $total_items = (int) $wpdb->get_var($wpdb->prepare('SELECT COUNT(DISTINCT `user_id`) FROM %i ' . $where, $table));
+
+            $group_by = ' GROUP BY `user_id` ';
+        } else {
+            $total_items = (int) $wpdb->get_var($wpdb->prepare('SELECT count(*) FROM %i ' . $where . $group_by, $table));
+        }
+        
+        if($this->page_action == 'statistic') {
+            $query = $wpdb->prepare('SELECT `user_id`, `user_name`, COUNT(*) as `total` FROM %i ' . $where . $group_by, $table);
+
+            $query .= ' ORDER BY `user_id` ';
+        } else if($this->page_action == 'status') {
+            $query = $wpdb->prepare('SELECT * FROM %i ' . $where . $group_by, $table);
+
+            $query .= ' ORDER BY `user_id` ';
+        } else {
+            $query = $wpdb->prepare('SELECT * FROM %i ' . $where . $group_by, $table);
+
+            if($this->tbl_name == 'lucky_results') {
+                $query .= ' ORDER BY `created` ';
+            } else {
+                $query .= ' ORDER BY `id` ';
+            }
+        }
+
+        // set limit
+        $query .= $wpdb->prepare(' LIMIT %d, %d', ($current_page - 1) * $per_page, $per_page);
+
+        $this->items = $wpdb->get_results($query, ARRAY_A);
+
+        $total_pages = 0;
+        if ($total_items > 0 && $per_page > 0) {
+            $total_pages = ceil($total_items / $per_page);
+        }
+
+        /**
+         * REQUIRED. We also have to register our pagination options & calculations.
+         */
+        $this->set_pagination_args(array(
+            'total_items' => $total_items,                  //WE have to calculate the total number of items
+            'per_page'    => $per_page,                     //WE have to determine how many items to show on a page
+            'total_pages' => $total_pages   //WE have to calculate the total number of pages
+        ));
+    }
+
+    /**
+     * 
+     * @return boolean;
+     */
+    function delete_item()
+    {
+        return false;
+    }
+
+    /**
+     * @params $id;
+     * 
+     * @return array();
+     */
+    function get_item($id = 0)
+    {
+        global $wpdb;
+
+        $query = $wpdb->prepare("SELECT * FROM %i WHERE id = %d ", $wpdb->prefix . $this->tbl_name, $id);
+
+        return $wpdb->get_row($query, ARRAY_A);
+    }
+
+    function get_current_user_screen_meta($key, $default)
+    {
+        $current_user = wp_get_current_user();
+
+        $v = (string) get_user_meta($current_user->ID, 'screen_meta_userlucky_' . $key, $single = true);
+        if ($v && $v != '') {
+            if (is_array($default)) {
+                $v = json_decode($v);
+                if (is_object($v)) {
+                    $v = get_object_vars($v);
+                }
+            } else if (is_numeric($default)) {
+                $v = (int) $v;
+            }
+            return $v;
+        }
+
+        return $default;
+    }
+
+    function update_current_user_screen_meta($key,  $value)
+    {
+        $current_user = wp_get_current_user();
+
+        if (empty($current_user->ID)) return false;
+
+        return update_user_meta($current_user->ID, 'screen_meta_userlucky_' . $key, json_encode($value));
+    }
+
+    function extra_tablenav($which = '') {
+        if ($this->user_can_export() == false) {
+            return;
+        }
+
+        if($which == 'top') {
+            if($this->page_action == '') {
+                echo '<label>'. __('From', 'site'). '</label><input type="date" name="lucky_export_from" /> ';
+                echo '<label>'. __('To', 'site'). '</label><input type="date" name="lucky_export_to" /> ';
+                echo '<button type="submit" name="lucky_export" class="button action" value="csv">'. __('Export CSV', 'site'). '</button>';
+            } else if($this->page_action == 'statistic') {
+                echo '<label>'. __('From', 'site'). '</label><input type="date" name="lucky_export_from" /> ';
+                echo '<label>'. __('To', 'site'). '</label><input type="date" name="lucky_export_to" /> ';
+                echo '<button type="submit" name="lucky_export" class="button action" value="statistic">'. __('Export CSV', 'site'). '</button>';
+            } else if($this->list_type == 'status-pending') {
+                echo '<button type="submit" name="lucky_export" class="button action" value="pending">'. __('Export CSV (Pending)', 'site'). '</button>';
+            }
+        }
+    }
+
+    /**
+     * @custom functions;
+     */
+    function user_can_export()
+    {
+        $user = wp_get_current_user();
+
+        return !empty($user->roles) && is_array($user->roles) && in_array('administrator', $user->roles);
+    }
+
+    function export_csv()
+    {
+        if ($this->user_can_export() == false) {
+            return;
+        }
+
+        global $wpdb;
+
+        $data = wp_unslash($_REQUEST);
+
+        $page       = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+        $date_from  = isset($data['lucky_export_from']) ? sanitize_text_field($data['lucky_export_from']) : '';
+        $date_to    = isset($data['lucky_export_to']) ? sanitize_text_field($data['lucky_export_to']) : '';
+        $action     = isset($data['action']) ? sanitize_text_field($data['action']) : '';
+
+        $query = $wpdb->prepare("SELECT * FROM %i WHERE 1", $wpdb->prefix . $this->tbl_name);
+
+        if ($date_from != '') {
+            $query .= $wpdb->prepare(" AND DATE_FORMAT(`created`, %s) >= %s", '%Y-%m-%d', $date_from);
+        }
+
+        if ($date_to != '') {
+            $query .= $wpdb->prepare(" AND DATE_FORMAT(`created`, %s) <= %s", '%Y-%m-%d', $date_to);
+        }
+
+        if($this->tbl_name == 'lucky_results') {
+            $query .= ' ORDER BY `created` ';
+        } else {
+            $query .= ' ORDER BY `id` ';
+        }
+
+        $items = $wpdb->get_results($query, ARRAY_A);
+
+        $rows = [];
+
+        $fields = $this->get_columns();
+        unset($fields['cb']);
+
+        $rows[] = implode(',', array_map('ucwords', array_values($fields)));
+
+        $keys = array_keys($fields);
+
+        if ($items && count($items) > 0) {
+            foreach ($items as $i => $item) {
+                $columns = [];
+
+                foreach ($keys as $key) {
+                    $columns[$key] = $this->column_default($item, $key);
+                }
+
+                if (isset($columns['id'])) {
+                    $columns['id'] = $i + 1;
+                }
+
+                $rows[] = '"' . implode('","', $columns) . '"';
+            }
+        }
+
+        $content = implode("\n", $rows);
+
+        site_csv_download($page . ($action != '' ? '-' . $action : '') . '-' . time() . '.csv', $content);
+    }
+    
+    function get_list_pending()
+    {
+        global $wpdb;
+
+        $query = $wpdb->prepare("SELECT * FROM %i WHERE `meta_key` = %s AND `meta_value` != %s GROUP BY `user_id`", $wpdb->prefix . 'usermeta', 'lucky_status', 'completed');
+
+        $items = $wpdb->get_results($query, ARRAY_A);
+
+        return $items;
+    }
+
+    function export_pending()
+    {
+        if ($this->user_can_export() == false) {
+            return;
+        }
+        
+        $this->set_var('list_type', 'status-pending');
+
+        $data = wp_unslash($_GET);
+
+        $page       = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+        $action     = isset($data['action']) ? sanitize_text_field($data['action']) : '';
+
+        $items = $this->get_list_pending();
+
+        $rows = [];
+
+        if ($items && count($items) > 0) {
+            $fields = $this->get_columns();
+            unset($fields['cb']);
+
+            $rows[] = implode(',', array_map('ucwords', array_values($fields)));
+
+            $keys = array_keys($fields);
+            
+            foreach ($items as $item) {
+                $columns = [];
+
+                foreach ($keys as $key) {
+                    $columns[$key] = $this->column_default($item, $key, 'csv');
+                }
+
+                $rows[] = '"' . implode('","', $columns) . '"';
+            }
+        }
+
+        $content = implode("\n", $rows);
+
+        site_csv_download($page . ($action != '' ? '-' . $action : '') . '-' . time() . '.csv', $content);
+    }
+
+    function export_statistic_users()
+    {
+        if ($this->user_can_export() == false) {
+            return;
+        }
+
+        global $wpdb;
+
+        $data = wp_unslash($_REQUEST);
+
+        $page       = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+        $date_from  = isset($data['lucky_export_from']) ? sanitize_text_field($data['lucky_export_from']) : '';
+        $date_to    = isset($data['lucky_export_to']) ? sanitize_text_field($data['lucky_export_to']) : '';
+        $action     = isset($data['action']) ? sanitize_text_field($data['action']) : '';
+        
+        $query = $wpdb->prepare("SELECT `user_id` AS id, `user_id`, `user_name`, COUNT(*) as `total` FROM %i WHERE 1", $wpdb->prefix . $this->tbl_name);        
+
+        if ($date_from != '') {
+            $query .= $wpdb->prepare(" AND DATE_FORMAT(`created`, %s) >= %s", '%Y-%m-%d', $date_from);
+        }
+
+        if ($date_to != '') {
+            $query .= $wpdb->prepare(" AND DATE_FORMAT(`created`, %s) <= %s", '%Y-%m-%d', $date_to);
+        }
+
+        $query .= ' GROUP BY `user_id` ORDER BY `created` DESC ';
+
+        $items = $wpdb->get_results($query, ARRAY_A);
+
+        $rows = [];
+
+        if ($items && count($items) > 0) {
+            $fields = $this->get_columns();
+            unset($fields['cb']);
+
+            $rows[] = '"' . implode('","', array_map('ucwords', array_values($fields))) . '"';
+
+            $keys = array_keys($fields);
+            
+            foreach ($items as $item) {
+                $columns = [];
+
+                foreach ($keys as $key) {
+                    $columns[$key] = $this->column_default($item, $key, 'csv');
+                }
+
+                $rows[] = '"' . implode('","', $columns) . '"';
+            }
+        }
+
+        $content = implode("\n", $rows);
+
+        site_csv_download($page . ($action != '' ? '-' . $action : '') . '-' . time() . '.csv', $content);
+    }
+
+    function export_statistic_gifts()
+    {
+        if ($this->user_can_export() == false) {
+            return;
+        }
+
+        $data = wp_unslash($_REQUEST);
+
+        $page       = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+        $date_from  = isset($data['lucky_export_from']) ? sanitize_text_field($data['lucky_export_from']) : '';
+        $date_to    = isset($data['lucky_export_to']) ? sanitize_text_field($data['lucky_export_to']) : '';
+        $action     = isset($data['action']) ? sanitize_text_field($data['action']) : '';
+    
+        $lucky = Lucky_Lotte::instance();
+
+        $statistic_gifts = $lucky->statistic_results([
+            'from'  => $date_from,
+            'to'    => $date_to,
+        ]);
+
+        $gifts = $lucky->get_gifts();
+
+        $rows = [];
+
+        $columns = [
+            '#',
+            'Quà',
+            'Tổng số quà',
+            'Đã trúng',
+            'Còn lại',
+        ];
+
+        $rows[] = '"' . implode('","', $columns) . '"';
+
+        if(count($gifts) > 0) {
+            
+            $i = 0;
+
+            foreach($gifts as $gift_id => $gift) {
+                $total = isset($statistic_gifts[$gift_id]) ? (int) $statistic_gifts[$gift_id] : 0;
+
+                $columns = [];
+
+                $columns[] = esc_attr(++$i);
+                $columns[] = esc_attr(isset($gift['name']) ? $gift['name'] : $gift_id);
+                $columns[] = number_format(isset($gift['total']) ? $gift['total'] : 0);
+                $columns[] = number_format($total, 0);
+                $columns[] = number_format($gift['total'] - $total);
+
+                $rows[] = '"' . implode('","', $columns) . '"';
+            }
+        }
+
+        $content = implode("\n", $rows);
+
+        site_csv_download($page . ($action != '' ? '-' . $action : '') . '-' . time() . '.csv', $content);
+    }
+}
+
+/**
+ * List page
+ *
+ * @since 1.1.1
+ *
+ */
+function site_lucky_list_page_admin_init()
+{
+    $data = wp_unslash($_GET);
+
+    $lucky_export = isset($data['lucky_export']) ? sanitize_text_field($data['lucky_export']) : '';
+    if($lucky_export == 'csv') {
+        $site_lucky_table = new Site_Lucky_List_Table();
+
+        $site_lucky_table->export_csv();
+    } else if($lucky_export == 'statistic') {
+        $type = isset($data['type']) ? sanitize_text_field($data['type']) : '';
+
+        $site_lucky_table = new Site_Lucky_List_Table();
+
+        if($type == 'users') {
+            $site_lucky_table->export_statistic_users();
+        } else {
+            $site_lucky_table->export_statistic_gifts();
+        }
+    } else if($lucky_export == 'pending') {
+        $site_lucky_table = new Site_Lucky_List_Table();
+
+        $site_lucky_table->export_pending();
+    }
+}
+add_action('admin_init', 'site_lucky_list_page_admin_init');
+
+/**
+ * List page
+ *
+ * @since 1.1.1
+ *
+ */
+function site_lucky_render_list_page()
+{
+    global $site_lucky_table;
+
+    $data = wp_unslash($_GET);
+
+    $action     = isset($data['action']) ? sanitize_text_field($data['action']) : '';
+    $id         = isset($data['id']) ? intval($data['id']) : 0;
+    $page       = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+    $uri        = explode('?', $_SERVER['REQUEST_URI']);
+    $current_url = $uri[0];
+
+    printf('<h1>%s</h1>', __('Lucky Bottle', 'site'));
+
+    $list = site_activities_get_menus();
+    foreach($list as $item) {
+        if($item[2] == $page) {
+            $title = $item[0];
+            break;
+        }
+    }
+
+    if ($action == 'rate') :
+
+        site_lucky_render_submenu($current_url);
+
+        // printf('<h2>%s</h2>', __('Rate', 'site'));
+        printf('<h2>%s</h2>', __('Tỉ lệ', 'site'));
+
+        site_lucky_render_table_rate();
+
+    elseif ($action == 'statistic') :
+        
+        site_lucky_render_submenu($current_url);
+
+        printf('<h2>%s</h2>', 'Thống kê giải thưởng');
+
+        site_lucky_render_table_statistic();
+
+    elseif ($action == 'luxury') :
+
+        site_lucky_render_submenu($current_url);
+
+        printf('<h2>%s</h2>', 'Xe Xin Den Tay');
+
+        site_lucky_render_table_luxury();
+        
+    elseif ($action == 'status') :
+        site_lucky_render_submenu($current_url);
+
+        if($id > 0) {
+            printf('<h2>Người tham gia: %s</h2>', get_the_author_meta('display_name', $id));
+
+            site_lucky_render_status_detail($id);
+        } else {
+            site_lucky_render_status_list($current_url);
+        }
+    elseif ($action == 'detail') :
+        if($id == 0) return;
+        
+        //Create an instance of our package class...
+        $site_lucky_table = new Site_Lucky_List_Table();
+
+        $item = $site_lucky_table->get_item($id);
+
+        site_lucky_render_submenu($current_url);
+
+        printf('<h2>%s</h2>', __($title, 'site'));
+
+        site_lucky_render_detail($item);
+    else :
+        //Create an instance of our package class...
+        $site_lucky_table = new Site_Lucky_List_Table();
+
+        //Fetch, prepare, sort, and filter our data...
+        $site_lucky_table->prepare_items();
+    ?>
+        <?php site_lucky_render_submenu($current_url); ?>
+
+        <?php add_thickbox(); ?>
+
+        <div class="wrap-list-table">
+            <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
+            <form id="result-filter" method="get">
+                <!-- For plugins, we also need to ensure that the form posts back to our current page -->
+                <input type="hidden" name="page" value="<?php esc_attr_e($page); ?>" />
+                <input type="hidden" name="action" value="<?php echo esc_attr($action); ?>" />
+                <!-- Now we can render the completed list table -->
+
+                <?php $site_lucky_table->search_box('Search', 'name'); ?>
+
+                <?php $site_lucky_table->display() ?>
+            </form>
+        </div>
+    <?php
+    endif;
+}
+
+/**
+ * Detail form
+ *
+ * @since 1.1.2
+ *
+ * @param object $item 
+ */
+function site_lucky_render_detail($item)
+{
+    global $site_lucky_table;
+
+    $data = wp_unslash($_GET);
+
+    $page = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+    $uri = explode('?', $_SERVER['REQUEST_URI']);
+
+    $columns = $site_lucky_table->get_columns();
+    unset($columns['cb']);
+    ?>
+    <div class="site_lucky_detail">
+        <table class="form-table" role="presentation">
+            <?php foreach($columns as $name => $label) : ?>
+            <tr>
+                <th scope="row"><label><?php esc_attr_e($label) ?></label></th>
+                <td><?php esc_attr_e(isset($item[$name]) ? $item[$name] : '') ?></td>
+            </tr>
+            <?php endforeach ?>
+        </table>
+        <p class="buttons">
+            <a class="button button-secondary" href="<?php echo esc_url(add_query_arg(['page' => $page], $uri[0])); ?>"><?php _e('Back', 'site'); ?></a>
+        </p>
+    </div>
+    <?php
+}
+
+function site_lucky_render_status_list($url)
+{
+    $data = wp_unslash($_GET);
+
+    $type       = isset($data['type']) ? sanitize_text_field($data['type']) : '';
+    $action     = isset($data['action']) ? sanitize_text_field($data['action']) : '';
+    $page       = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+
+    $args = [
+        'page' => $page,
+        'action' => $action
+    ];
+
+    // echo '<div class="wrap-list-table"></br>';
+    // printf('<a href="%s">Danh sách người dùng</a>', add_query_arg($args), $url);
+    // printf(' | <a href="%s">Danh sách pending</a>', add_query_arg(array_merge($args, ['type' => 'pending']), $url));
+    // echo '</br>';
+
+    if($type == 'pending') {
+        //Create an instance of our package class...
+        $site_lucky_table = new Site_Lucky_List_Table();
+
+        // set list status-pending
+        $site_lucky_table->set_var('list_type', 'status-pending');
+
+        // add more list on top
+        $site_lucky_table->prepare_items();
+
+        ?>
+        <hr>
+        <h4><?php printf('<a href="%s">Danh sách người dùng</a>', add_query_arg($args, $url)) ?> | Danh sách pending</h4>
+        <hr>
+        <div class="wrap-list-table">
+            <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
+            <form id="pending-filter" method="get">
+                <!-- For plugins, we also need to ensure that the form posts back to our current page -->
+                <input type="hidden" name="page" value="<?php esc_attr_e($page); ?>" />
+                <input type="hidden" name="action" value="<?php echo esc_attr($action); ?>" />
+                <input type="hidden" name="type" value="<?php echo esc_attr($type); ?>" />
+                <?php $site_lucky_table->search_box('Search', 'name'); ?>
+                <!-- Now we can render the completed list table -->
+                <?php $site_lucky_table->display() ?>
+            </form>
+        </div>
+        <?php
+    } else {
+        //Create an instance of our package class...
+        $site_lucky_table = new Site_Lucky_List_Table();
+        
+        // set list default
+        $site_lucky_table->set_var('list_type', '');
+
+        //Fetch, prepare, sort, and filter our data...
+        $site_lucky_table->prepare_items();
+        ?>
+        <hr>
+        <h4>Danh sách người dùng | <?php printf('<a href="%s">Danh sách pending</a>', add_query_arg(array_merge($args, ['type' => 'pending']), $url)) ?></h4>
+        <hr>
+        <div class="wrap-list-table">
+            <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
+            <form id="result-filter" method="get">
+                <!-- For plugins, we also need to ensure that the form posts back to our current page -->
+                <input type="hidden" name="page" value="<?php esc_attr_e($page); ?>" />
+                <input type="hidden" name="action" value="<?php echo esc_attr($action); ?>" />
+                <input type="hidden" name="type" value="<?php echo esc_attr($type); ?>" />
+                <?php $site_lucky_table->search_box('Search', 'name'); ?>
+                <!-- Now we can render the completed list table -->
+                <?php $site_lucky_table->display() ?>
+            </form>
+        </div>
+        <?php
+    }
+}
+
+function site_lucky_render_status_detail($user_id = 0)
+{
+    global $wpdb;
+
+    $data = wp_unslash($_GET);
+
+    $page = sanitize_text_field(isset($data['page']) ? $data['page'] : '');
+    $uri = explode('?', $_SERVER['REQUEST_URI']);
+
+    $lucky = Lucky_Lotte::instance([
+        'user_id' => $user_id
+    ]);
+
+    $user_results = $lucky->get_results([
+        'user_id' => $user_id,
+        'orderby' => 'id',
+    ]);
+
+    // $gifts = $lucky->get_gifts();
+    ?>
+    <div class="site_lucky_detail">
+
+        <!-- Trạng thái người chơi: Bị cấm (Banned), Đang chờ (Pending), Hoàn thành (Completed).
+        Trạng thái lượt chơi: Có giải (ghi rõ giải gì), Không có giải.
+        Trạng thái Fill in the blank: Hoàn thành hay Đang chờ (Pending). -->
+
+        <table class="form-table" role="presentation">
+            <tr>
+                <th scope="row"><label>Trạng thái người chơi:</label></th>
+                <td><?php  
+                    if(site_api_must_buy_is_locked_user($user_id)) {
+                        echo 'Bị cấm (Banned)';
+                    } else if($wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM %i WHERE `status` != %s AND `user_id` = %d", $lucky->get_table('code'), 'completed', $user_id)) > 0) {
+                        echo 'Đang chờ (Pending).';
+                    } else {
+                        echo 'Hoàn thành (Completed).';
+                    }
+                ?></td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Lịch sử chơi:</label></th>
+                <td><?php
+                    if(count($user_results) > 0) {
+                        echo 'Có giải';
+
+                        foreach($user_results as $item) {
+                            echo '<br> - ' . $item['name'] . ' - ' . $item["created"];
+                        }
+                    } else {
+                        echo 'Không có giải';
+                    }
+                ?></td>
+            </tr>
+            <tr>
+                <th scope="row"><label>Trạng thái Fill in the blank:</label></th>
+                <td><?php 
+                    if($wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM %i WHERE `status` = %s AND `user_id` = %d", $lucky->get_table('code'), 'fill-blank', $user_id)) > 0) {
+                        echo 'Đang chờ (Pending).';
+                    } else {
+                        echo 'Hoàn thành (Completed).';
+                    }
+                ?></td>
+            </tr>
+        </table>
+        <p class="buttons">
+            <a class="button button-secondary" href="<?php echo esc_url(add_query_arg(['page' => $page], $uri[0])); ?>"><?php _e('Back', 'site'); ?></a>
+        </p>
+    </div>
+    <?php
+}
+
+function site_lucky_render_submenu($url = '')
+{
+    $data = wp_unslash($_GET);
+
+    $page   = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+    $action = isset($data['action']) ? sanitize_text_field($data['action']) : 'result';
+
+    $submenu = [
+        'result' => 'Thống kê người dùng', // __('Result', 'Site'),
+        'statistic' => 'Thống Kê Tổng Quan', // __('Statistic', 'Site'),
+        'status' => 'Trạng Thái người dùng', // __('Rate', 'Site'),
+        'rate' => 'Tỉ lệ', // __('Rate', 'Site'),
+        'luxury' => 'Xe Xin Den Tay',
+    ];
+
+    $i = 0;
+
+    ?>
+    <ul class="subsubsub">
+        <?php foreach($submenu as $name => $title) : 
+            $args = ['page' => $page];
+            
+            if($name != 'result') {
+                $args['action'] = $name;
+            }
+        ?>
+        <li>
+            <a <?php echo $action == $name ? 'class="current"' : '' ?> href="<?php echo esc_url(add_query_arg($args, $url)) ?>"><?php echo esc_attr($title) ?></a>
+            <?php
+                echo ++$i < count($submenu) ? ' |' : ''
+            ?>
+        </li>
+        <?php endforeach ?>
+    </ul>
+    <div class="clear"></div>
+    <?php
+}
+
+/**
+ * Table rate
+ */
+function site_lucky_render_table_rate()
+{
+    $data = wp_unslash($_GET);
+
+    $page   = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+    // $action = isset($data['action']) ? sanitize_text_field($data['action']) : '';
+    $uri = explode('?', $_SERVER['REQUEST_URI']);
+
+    $lucky = Lucky_Lotte::instance();
+    $rates = $lucky->get_rates('all');
+    
+    $statistic_results = [];
+
+    $today = current_time('Y-m-d');
+
+    // $list_random_index = $lucky->is_use_list_random('index');
+    $list_random_dates = site_lucky_get_list_random_dates();
+
+    // site_lucky_render_table_rate_menu_action();
+    
+    ?>
+    <style>
+    .result tr.active td:first-child{
+        border-left: 2px solid #02ff02;
+    }
+    .result tr.active td{
+        font-weight: bold;
+    }
+    </style>
+    <div class="site_lucky_detail">
+        <?php if(count($rates) > 0) : ?>
+        <p>Today: <b><?php echo $today ?></b>. <a href="#row-active">Go to row active</a></p>
+        <table class="wp-list-table widefat fixed striped table-view-list result">
+            <thead>
+                <tr>
+                    <th class="manage-column" width=20>#</th>
+                    <th class="manage-column" width=100>Từ<?php // esc_attr_e('From', 'site') ?></label></th>
+                    <th class="manage-column" width=100>Đến<?php // esc_attr_e('To', 'site') ?></label></th>
+                    <th class="manage-column">Quà<?php // esc_attr_e('Prize', 'site') ?></label></th>
+                    <!-- <th class="manage-column" width=80>Tỉ lệ<?php // esc_attr_e('Rate', 'site') ?></label></th> -->
+                    <th class="manage-column" width=100>Tổng số quà<?php // esc_attr_e('Total', 'site') ?></label></th>
+                    <th class="manage-column" width=100>Đã trúng<?php // esc_attr_e('Won', 'site') ?></label></th>
+                    <th class="manage-column" width=100>Còn lại<?php // esc_attr_e('Remaining', 'site') ?></label></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php 
+            $break_date = '';
+
+            foreach($rates as $i => $item) :
+
+                $from   = date('Y-m-d', strtotime($item['date_from']));
+                $to     = date('Y-m-d', strtotime($item['date_to']));
+                $gift_id    = $item['gift_id'];
+
+                if(empty($statistic_results[$from])) {
+                    $statistic = $statistic_results[$from] = $lucky->statistic_results([
+                        'from' 	=> $from,
+                        'to' 	=> $to,
+                    ]);
+                } else {
+                    $statistic = $statistic_results[$from];
+                }
+
+                $won = !empty($statistic[$gift_id]) ? (int) $statistic[$gift_id] : 0;
+
+                $more = '';
+
+                if(isset($list_random_dates[$from])) {
+                    $more = ' <span style="text-align: center; color: red">'. $list_random_dates[$from] . '</span>';
+                }
+
+                if($break_date != $from){
+                    echo '<tr'.($from <= $today && $today <= $to ? ' id="row-active"' : '').'><th colspan="7" style="text-align:center;"><b>'.$from.' - '. $to . ' ' . $more .'</b></th></tr>';
+                }
+
+                $break_date = $from;
+            ?>
+            <tr class="<?php echo $from <= $today && $today <= $to ? 'active' : '' ?>">
+                <td><?php echo $i + 1 ?></td>
+                <td class="td-from"><?php echo esc_attr($from) ?></td>
+                <td class="td-to"><?php echo esc_attr($to) ?></td>
+                <td><?php echo esc_attr($item['name']) ?></td>
+                <!-- <td><?php echo esc_attr($item['rate']) ?>%</td> -->
+                <td><?php echo esc_attr(number_format($item['total'])) ?></td>
+                <td><?php echo esc_attr(number_format($won)) ?></td>
+                <td><?php echo esc_attr(number_format($item['total'] - $won)) ?></td>
+            </tr>
+            <?php endforeach ?>
+            </tbody>
+        </table>
+        <?php else: ?>
+        <p style="color: red"><?php esc_attr_e('Empty', 'site'); ?></p>
+        <?php endif ?>
+        <p class="buttons">
+            <a class="button button-secondary" href="<?php echo esc_url(add_query_arg(['page' => $page], $uri[0])); ?>"><?php _e('Back', 'site'); ?></a>
+        </p>
+    </div>
+    <?php
+}
+
+function site_lucky_get_list_random_dates()
+{
+    $list = [
+        '2025-09-15' => 'Chơi 10 trúng 3',
+        '2025-12-15' => 'Chơi 10 trúng 3',
+        '2025-12-20' => 'Chơi 10 trúng 2',
+        '2025-12-26' => 'Chơi 20 trúng 3',
+        '2025-12-31' => 'Chơi 25 trúng 3',
+        '2026-01-05' => 'Chơi 25 trúng 3',
+        '2026-01-12' => 'Chơi 10 trúng 1',
+        '2026-01-19' => 'Chơi 10 trúng 1',
+        '2026-01-26' => 'Chơi 14 trúng 1',
+        '2026-02-02' => 'Chơi 14 trúng 1',
+        '2026-02-09' => 'Chơi 14 trúng 1',
+        '2026-02-16' => 'Chơi 14 trúng 1',
+        '2026-02-23' => 'Chơi 20 trúng 1',
+        '2026-03-02' => 'Chơi 20 trúng 1',
+        '2026-03-09' => 'Chơi 10 trúng 1',
+    ];
+
+    return $list;
+}
+
+function site_lucky_render_table_rate_menu_action()
+{
+    $user = wp_get_current_user();
+
+    if(empty($user->roles) || in_array('administrator', $user->roles) == false) {
+        return;
+    }
+
+    $data = wp_unslash($_GET);
+
+    $args = [
+        'page'  => isset($data['page']) ? sanitize_text_field($data['page']) : '',
+        'action'=> isset($data['action']) ? sanitize_text_field($data['action']) : '',
+        'nonce' => wp_create_nonce('update-nonce'),
+    ];
+    
+    $list = site_lucky_render_table_rate_get_actions();
+
+    ?>
+    <ol>
+        <?php foreach($list as $name => $title) :?>
+        <li><a href="<?php echo add_query_arg(array_merge($args, ['update' => $name])) ?>"><?php echo $title ?></a></li>
+        <?php endforeach ?>
+    </ol>
+    <?php
+}
+
+function site_lucky_render_table_rate_get_actions()
+{
+    return [
+        'golden' => 'Set Quay trúng Golden Ticket',
+        'voucher' => 'Set Quay trúng Giải 1 (E-voucher 200k)',
+        '20k' => 'Set Quay trúng Giải 2 (Top up 20k)',
+        '10k' => 'Set Quay trúng Giải 3 (Top up 10k)',
+        'try-again' => 'Set Quay không trúng thưởng',
+        'reset' => 'Set default',
+    ];
+}
+
+function site_lucky_render_table_rate_submit()
+{
+    $user = wp_get_current_user();
+
+    if(empty($user->roles) || in_array('administrator', $user->roles) == false) {
+        return;
+    }
+    
+    $data = wp_unslash($_GET);
+
+    $nonce = isset($data['nonce']) ? sanitize_text_field($data['nonce']) : '';
+    $update = isset($data['update']) ? sanitize_text_field($data['update']) : '';
+    $list = site_lucky_render_table_rate_get_actions();
+    
+    if($nonce == '' || wp_verify_nonce($nonce, 'update-nonce') == false || empty($list[$update])) return;
+
+    $page   = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+    $action = isset($data['action']) ? sanitize_text_field($data['action']) : '';
+
+    // $date_rates = [
+    //     1 => ['total' => 6600, 'rate' => 0], // 10,000 VND
+    //     2 => ['total' => 350, 'rate' => 0], // 20,000 VND
+    //     3 => ['total' => 90, 'rate' => 0], // 200,000 VND
+    //     4 => ['total' => 100, 'rate' => 0], // Thẻ May Mắn
+    //     5 => ['total' => 781704, 'rate' => 0], // Chúc may mắn
+    // ];
+
+    $date_rates = [
+        1 => ['rate' => 0], // 10,000 VND
+        2 => ['rate' => 0], // 20,000 VND
+        3 => ['rate' => 0], // 200,000 VND
+        4 => ['rate' => 0], // Thẻ May Mắn
+        5 => ['rate' => 0], // Chúc may mắn
+    ];
+
+    if($update == 'golden') {
+        $date_rates[4]['rate'] = 99;
+        $date_rates[5]['rate'] = 1;
+    } else if($update == 'voucher') {
+        $date_rates[3]['rate'] = 99;
+        $date_rates[5]['rate'] = 1;
+    } else if($update == '20k') {
+        $date_rates[2]['rate'] = 99;
+        $date_rates[5]['rate'] = 1;
+    } else if($update == '10k') {
+        $date_rates[1]['rate'] = 99;
+        $date_rates[5]['rate'] = 1;
+    } else if($update == 'try-again') {
+        $date_rates[5]['rate'] = 100;
+    } else if($update == 'reset') {
+        $date_rates = [
+            1 => ['rate' => 10], // 10,000 VND
+            2 => ['rate' => 10], // 20,000 VND
+            3 => ['rate' => 10], // 200,000 VND
+            4 => ['rate' => 10], // Thẻ May Mắn
+            5 => ['rate' => 60], // Chúc may mắn
+        ];
+    }
+
+    global $wpdb;
+
+    $lucky = Lucky_Lotte::instance();
+
+    foreach($date_rates as $id => $data) {
+        $wpdb->update($lucky->get_table('rates'), $data, ['id' => $id], ['%d'], ['%d']);
+    }
+
+    $uri = explode('?', $_SERVER['REQUEST_URI']);
+
+    wp_redirect(add_query_arg([
+        'page' => $page,
+        'action' => $action,
+        'success' => date('Ymd-His'),
+    ], $uri[0]));
+    exit();
+}
+// add_action('admin_init', 'site_lucky_render_table_rate_submit');
+
+/**
+ * Table luxury
+ */
+function site_lucky_render_table_luxury()
+{
+    $data = wp_unslash($_GET);
+
+    $page = sanitize_text_field(isset($data['page']) ? $data['page'] : '');
+    $uri = explode('?', $_SERVER['REQUEST_URI']);
+
+    $lucky = Lucky_Lotte::instance();
+    $list = $lucky->get_list_luxury();
+
+    ?>
+    <div class="site_lucky_detail">
+        <?php if(count($list) > 0) : ?>
+        <table class="wp-list-table widefat fixed striped table-view-list result">
+            <thead>
+                <tr>
+                    <th class="manage-column">#</label></th>
+                    <th class="manage-column"><?php esc_attr_e('User Name', 'site') ?></label></th>
+                    <th class="manage-column"><?php esc_attr_e('User Phone', 'site') ?></label></th>
+                    <th class="manage-column"><?php esc_attr_e('User Code', 'site') ?></label></th>
+                    <th class="manage-column"><?php esc_attr_e('CCCD', 'site') ?></label></th>
+                    <th class="manage-column"><?php esc_attr_e('Code', 'site') ?></label></th>
+                    <th class="manage-column"><?php esc_attr_e('Created', 'site') ?></label></th>
+                    <th class="manage-column"><?php esc_attr_e('Created By', 'site') ?></label></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach($list as $i => $item) : ?>
+            <tr>
+                <td><?php echo esc_attr($i + 1) ?></td>
+                <td><?php echo esc_attr($item['user_name']) ?></td>
+                <td><?php echo esc_attr($item['user_phone']) ?></td>
+                <td><?php echo esc_attr($item['user_code']) ?></td>
+                <td><?php echo esc_attr(get_user_meta($item['user_id'], 'cccd', true)) ?></td>
+                <td><?php echo esc_attr($item['code']) ?></td>
+                <td><?php echo esc_attr($item['created']) ?></td>
+                <td><?php echo esc_attr(get_the_author_meta('display_name', $item['created_by'])) ?></td>
+            </tr>
+            <?php endforeach ?>
+            </tbody>
+        </table>
+        <?php else: ?>
+        <p style="color: red"><?php esc_attr_e('Empty', 'site'); ?></p>
+        <?php endif ?>
+        <p class="buttons">
+            <a class="button button-secondary" href="<?php echo esc_url(add_query_arg(['page' => $page], $uri[0])); ?>"><?php esc_attr_e('Back', 'site'); ?></a>
+        </p>
+    </div>
+    <?php
+}
+
+/**
+ * Table statistic
+ */
+function site_lucky_render_table_statistic()
+{
+    global $wpdb;
+
+    $data = wp_unslash($_GET);
+
+    $page = isset($data['page']) ? sanitize_text_field($data['page']) : '';
+    $action = isset($data['action']) ? sanitize_text_field($data['action']) : '';
+    $uri = explode('?', $_SERVER['REQUEST_URI']);
+
+    $lucky = Lucky_Lotte::instance();
+    
+    $statistic_gifts = $lucky->statistic_results();
+
+    // user count
+    // $query = $wpdb->prepare("SELECT `user_id`, `user_name`, COUNT(*) as `total` FROM %i GROUP BY `user_id`", $lucky->get_table('results'));
+    // $statistic_users = $wpdb->get_results($query, ARRAY_A);
+    // $count_users = count($statistic_users);
+    
+    $query = $wpdb->prepare("SELECT COUNT(DISTINCT `user_id`) FROM %i", $lucky->get_table('results'));
+    $count_users = (int) $wpdb->get_var($query);
+
+    // $query = $wpdb->prepare("SELECT COUNT(DISTINCT `user_id`) FROM %i WHERE `user_id` > 0", $lucky->get_table('code'));
+    // $count_registers = (int) $wpdb->get_var($query);
+
+    $query = $wpdb->prepare("SELECT COUNT(*) FROM %i WHERE `meta_key` = %s", $wpdb->usermeta, 'lucky_status');
+    $count_registers = (int) $wpdb->get_var($query);
+    
+    $gifts = $lucky->get_gifts();
+
+    //Create an instance of our package class...
+    $site_lucky_table = new Site_Lucky_List_Table();
+
+    //Fetch, prepare, sort, and filter our data...
+    $site_lucky_table->prepare_items();
+
+    ?>
+    <div class="site_lucky_detail">
+        <p>Tồng số người đã lắc hũ: <strong><?php echo $count_users ?></strong> người.</p>
+        <p>Tổng số người đăng ký: <strong><?php echo $count_registers ?></strong> người.</p>
+
+        <h3 data-title="<?php esc_attr_e('Gifts', 'site') ?>">Thống kê quà</h3>
+        <div class="wrap-list-table">
+            <form id="result-filter-1" method="get">
+                <!-- For plugins, we also need to ensure that the form posts back to our current page -->
+                <input type="hidden" name="page" value="<?php esc_attr_e($page); ?>" />
+                <input type="hidden" name="action" value="<?php echo esc_attr($action); ?>" />
+                <input type="hidden" name="type" value="gifts" />
+                <div class="tablenav top">
+                    <?php $site_lucky_table->extra_tablenav('top') ?>
+                    <br class="clear">
+                </div>
+                <table class="wp-list-table widefat fixed striped table-view-list result">
+                    <thead>
+                        <tr>
+                            <th class="manage-column">#</label></th>
+                            <th class="manage-column">Quà</label></th>
+                            <th class="manage-column">Tổng số quà</label></th>
+                            <th class="manage-column">Đã trúng</label></th>
+                            <th class="manage-column">Còn lại</label></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                        if(count($gifts) > 0) : 
+                        $i = 0;
+                        foreach($gifts as $gift_id => $gift) : 
+                            $total = isset($statistic_gifts[$gift_id]) ? (int) $statistic_gifts[$gift_id] : 0;
+                        ?>
+                        <tr>
+                            <td><?php echo esc_attr(++$i) ?></td>
+                            <td><?php echo esc_attr(isset($gift['name']) ? $gift['name'] : $gift_id) ?></td>
+                            <td><?php echo number_format(isset($gift['total']) ? $gift['total'] : 0) ?></td>
+                            <td><?php echo number_format($total, 0) ?></td>
+                            <td><?php echo number_format($gift['total'] - $total) ?></td>
+                        </tr>
+                        <?php 
+                            endforeach;
+                        else: ?>
+                        <tr><td colspan="3" style="color: red"><?php esc_attr_e('Empty', 'site'); ?></td></tr>
+                        <?php endif ?>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+
+        <h3 data-title="<?php esc_attr_e('Users', 'site') ?>">Thống kê người tham gia</h3>
+        <div class="wrap-list-table">
+            <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
+            <form id="result-filter-2" method="get">
+                <!-- For plugins, we also need to ensure that the form posts back to our current page -->
+                <input type="hidden" name="page" value="<?php esc_attr_e($page); ?>" />
+                <input type="hidden" name="action" value="<?php echo esc_attr($action); ?>" />
+                <input type="hidden" name="type" value="users" />
+                <?php $site_lucky_table->search_box('Search', 'name'); ?>
+                <!-- Now we can render the completed list table -->
+                <?php $site_lucky_table->display() ?>
+            </form>
+        </div>
+
+        <p class="buttons">
+            <a class="button button-secondary" href="<?php echo esc_url(add_query_arg(['page' => $page], $uri[0])); ?>"><?php esc_attr_e('Back', 'site'); ?></a>
+        </p>
+    </div>
+    <?php
+}

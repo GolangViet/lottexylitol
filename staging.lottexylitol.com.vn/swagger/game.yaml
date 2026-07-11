@@ -1,0 +1,110 @@
+openapi: 3.0.3
+info:
+  title: Swagger Game - OpenAPI 3.0
+  description: Swagger Game
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: /api
+paths:
+  /game:
+    get:
+      tags:
+        - User
+      summary: Get User Info
+      description: This can only be done by the logged in user.
+      operationId: getUserInfo
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseUser'
+      security:
+        - jwt_token: []
+  /game/token:
+    get:
+      tags:
+        - User
+      summary: Get Game Token
+      description: This can only be done by the logged in user.
+      operationId: getGameToken
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+      security:
+        - jwt_token: []
+components:
+  schemas:
+    User:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        user_id:
+          type: number
+          example: 1
+        name:
+          type: string
+          example: John
+    Response:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        error:
+          type: string
+          example: errors
+        message:
+          type: string
+          description: message
+    ResponseUser:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        data:
+          type: object
+          properties:
+            user_id:
+              type: number
+              example: 1
+            name:
+              type: string
+              example: John
+        message:
+          type: string
+          description: message
+    ResponseToken:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        iat:
+          type: string
+          example: time
+        expires_in:
+          type: string
+          example: expires time
+        jwt_token:
+          type: string
+          description: code
+  securitySchemes:
+    jwt_token:
+      type: apiKey
+      name: token
+      in: header

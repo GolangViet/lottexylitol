@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  php:
+    container_name: game-api
+    build:
+      context: ./docker/php
+    ports:
+      - "4000:80"
+    volumes:
+      - ./api:/var/www/html
+    environment:
+      DOCKER: true

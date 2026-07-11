@@ -1,0 +1,711 @@
+openapi: 3.0.3
+info:
+  title: Swagger Website - OpenAPI 3.0
+  description: Swagger Website
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: /api
+paths:
+  /user/signin:
+    post:
+      tags:
+        - user
+      summary: Get User Token
+      description: Get User Token
+      operationId: getUserToken
+      requestBody:
+        description: Get User Token
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserSignin'
+        required: true
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ResponseToken'
+        '401':
+          description: Invalid input
+  /user/signup:
+    post:
+      tags:
+        - user
+      summary: Create User
+      description: Create User.
+      operationId: createUser
+      requestBody:
+        description: Created User object
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /user/forgot:
+    post:
+      tags:
+        - user
+      summary: Forgot Password
+      description: Forgot Password.
+      operationId: forgotPassword
+      requestBody:
+        description: Forgot Password object
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserForgot'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /user/verify/newpass:
+    post:
+      tags:
+        - user
+      summary: User Verify
+      description: User Verify.
+      operationId: User verify
+      requestBody:
+        description: User Verify object
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserVerify'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /user/phone/sms:
+    post:
+      tags:
+        - user
+      summary: Send OTP
+      description: Send OTP.
+      operationId: Send otp
+      requestBody:
+        description: Send OTP object
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserPhoneSMS'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /user/phone/verify:
+    post:
+      tags:
+        - user
+      summary: User Verify Phone
+      description: User Verify Phone.
+      operationId: User verify Phone
+      requestBody:
+        description: User Verify Phone object
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserVerifyPhone'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+  /user/info:
+    get:
+      tags:
+        - user
+      summary: Get User Info
+      description: This can only be done by the logged in user.
+      operationId: getUserInfo
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseUser'
+      security:
+        - jwt_token: []
+    post:
+      tags:
+        - user
+      summary: Update User Info
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      requestBody:
+        description: Updated user object
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - jwt_token: []
+  /user/contest:
+    post:
+      tags:
+        - user
+      summary: Create User contest
+      description: This can only be done by the logged in user.
+      operationId: createUserContest
+      requestBody:
+        description: Created Contest object
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Contest'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - jwt_token: []
+  /user/survey:
+    get:
+      tags:
+        - user
+      summary: Get User Surveys
+      description: This can only be done by the logged in user.
+      operationId: getUserSurveys
+      parameters:
+        - name: lang
+          in: query
+          description: Filter by lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - vi
+              - en
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseSurvey'
+      security:
+        - jwt_token: []
+  /user/survey/brand:
+    get:
+      tags:
+        - user
+      summary: Get User Brand Surveys
+      description: This can only be done by the logged in user.
+      operationId: getUserBrandSurveys
+      parameters:
+        - name: lang
+          in: query
+          description: Filter by lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - vi
+              - en
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseSurvey'
+      security:
+        - jwt_token: []
+  /user/winner:
+    get:
+      tags:
+        - user
+      summary: Get User Winner
+      operationId: getUserWinner
+      parameters:
+        - name: lang
+          in: query
+          description: Filter by lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - vi
+              - en
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Winner'
+      security:
+        - jwt_token: []
+  /user/history:
+    get:
+      tags:
+        - user
+      summary: Get User history
+      description: This can only be done by the logged in user.
+      operationId: getUserHistory
+      parameters:
+        - name: year
+          in: query
+          description: Filter by year
+          required: false
+          schema:
+            type: string
+            format: year
+        - name: lang
+          in: query
+          description: Filter by lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - vi
+              - en
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponseHistory'
+      security:
+        - jwt_token: []
+  /user/answer:
+    get:
+      tags:
+        - user
+      summary: Get User Answer
+      description: This can only be done by the logged in user.
+      operationId: getUserAnswer
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseAnswer'
+      security:
+        - jwt_token: []
+    post:
+      tags:
+        - user
+      summary: Create User Answer
+      description: This can only be done by the logged in user.
+      operationId: createUserAnswer
+      requestBody:
+        description: Create Answer object
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Answer'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - jwt_token: []
+  /user/answer/brand:
+    post:
+      tags:
+        - user
+      summary: Create User Brand Answer
+      description: This can only be done by the logged in user.
+      operationId: createUserBrandAnswer
+      requestBody:
+        description: Create Answer object
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Answer'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - jwt_token: []
+  /page/brand:
+    get:
+      tags:
+        - page
+      summary: Get Page Brand
+      operationId: getPageBrand
+      parameters:
+        - name: lang
+          in: query
+          description: Filter by lang
+          required: false
+          schema:
+            type: string
+            enum:
+              - vi
+              - en
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResponsePage'
+      security:
+        - jwt_token: []
+components:
+  schemas:
+    User:
+      required:
+        - name
+        - email
+        - phone
+        - address
+        - city
+        - gender
+        - age
+        - password
+      type: object
+      properties:
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@email.com
+        phone:
+          type: string
+          example: '0931231234'
+        address:
+          type: string
+          example: 123 Street
+        city:
+          type: string
+          example: HCM
+        gender:
+          type: string
+          example: male
+        age:
+          type: number
+          example: 18
+        password:
+          type: string
+          example: 'Abc@12345'
+          writeOnly: true
+    UserUpdate:
+      required:
+        - name
+        - email
+        - phone
+        - address
+        - city
+        - gender
+        - age
+      type: object
+      properties:
+        name:
+          type: string
+          example: John
+        email:
+          type: string
+          example: john@email.com
+        phone:
+          type: string
+          example: '0931231234'
+        address:
+          type: string
+          example: 123 Street
+        city:
+          type: string
+          example: HCM
+        gender:
+          type: string
+          example: male
+        age:
+          type: number
+          example: 18
+        newpassword:
+          type: string
+          description: 'Abc@12345'
+        oldpassword:
+          type: string
+          description: 'Xyz@54321'
+    UserSignin:
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        username:
+          type: string
+          example: '0901234567'
+          description: email or phone
+        password:
+          type: string
+          example: '2mzaksEzr3dhQX4lmEF3'
+    UserForgot:
+      required:
+        - email
+      type: object
+      properties:
+        email:
+          type: string
+          example: john@email.com
+    UserVerify:
+      required:
+        - email
+        - code
+        - newpassword
+      type: object
+      properties:
+        email:
+          type: string
+          example: john@email.com
+        code:
+          type: number
+          example: 123456
+        newpassword:
+          type: string
+          description: 'Abc@12345'
+    UserPhoneSMS:
+      required:
+        - phone
+      type: object
+      properties:
+        phone:
+          type: string
+          example: '0931231234'
+    UserVerifyPhone:
+      required:
+        - phone
+        - code
+      type: object
+      properties:
+        phone:
+          type: string
+          example: '0931231234'
+        code:
+          type: number
+          example: 123456
+    Gift:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+        name:
+          type: string
+          example: Gift
+        point:
+          type: number
+          example: 5
+    Contest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: https://www.facebook.com/
+    Upload:
+      type: object
+      properties:
+        image:
+          type: string
+          description: image base64
+    Answer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: Survey Id
+        answer:
+          type: string
+          example: Answer Key
+    History:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        created:
+          type: string
+    Winner:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        city:
+          type: string
+    Comment:
+      type: object
+      properties:
+        content:
+          type: string
+          example: Comment
+    Response:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        error:
+          type: string
+          example: errors
+        message:
+          type: string
+          description: message
+    ResponseUser:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        user:
+          schema:
+            $ref: '#/components/schemas/User'
+        message:
+          type: string
+          description: message
+    ResponseToken:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        iat:
+          type: string
+          example: time
+        expires_in:
+          type: string
+          example: expires time
+        jwt_token:
+          type: string
+          description: code
+    ResponseAnswer:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Answer'
+        message:
+          type: string
+          description: message
+    ResponseSurvey:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        items:
+          type: string
+          example: list survey
+        message:
+          type: string
+          description: message
+    ResponsePage:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        item:
+          type: string
+          example: data
+        message:
+          type: string
+          description: message
+    ResponseHistory:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/History'
+        years:
+          type: array
+          items:
+            type: string
+            example: 2024
+        message:
+          type: string
+          description: message
+    ResponseGift:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 200
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Gift'
+        message:
+          type: string
+          description: message
+  securitySchemes:
+    jwt_token:
+      type: apiKey
+      name: token
+      in: header
+      description: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoibG90dGVyLTE3MTc3NTU3MjIyNjYyIiwiaWF0IjoxNzE3OTg1MDU2LCJleHAiOjE3Nzc5ODUwNTZ9.OTBkNjQ0NDgwOWE5OTIyMzQ4ZjQxYmRjOTIxNjdjYjY2NzVlNzUzOGMxNzUxZGUzNjczMzcwOTdmMDM1YTA3Mg

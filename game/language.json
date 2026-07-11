@@ -1,0 +1,36 @@
+{
+  "vi": {
+    "loading": "ĐANG TẢI...",
+    "score": "Điểm số",
+    "level": "Cấp",
+    "guidanceTitle": "MISSION",
+    "guidance": "Di chuyển hũ kẹo gum (Lotte Xylitol) qua lại trên màn hình, viên kẹo sẽ tự động được bắn từ hũ kẹo.\nNếu bạn không bắn kịp vi khuẩn và vi khuẩn xuất hiện đầy trên màn hình thì bạn sẽ thua cuộc ngay lập tức.",
+    "resultTxt01": "Cảm ơn bạn đã tham gia",
+    "resultTxt02": "CHƯƠNG TRÌNH CỦA LOTTE XYLITOL",
+    "resultTxt03": "Đừng quên theo dõi website để nhận kết quả và các thông tin hấp dẫn từ Lotte Xylitol nhé.",
+    "errors": {
+      "RUN_OUT_OF_TURNS": "Bạn đã hết lượt chơi.",
+      "GAME_NOT_FOUND": "Không thể lấy thông tin trò chơi.",
+      "GAME_ALREADY_STARTED": "Lượt chơi của bạn đã bắt đầu. Vui lòng thử lại sau 2 phút.",
+      "UNABLE_GET_USER": "Không thể lấy thông tin người dùng.",
+      "INVALID_DATA": "Dữ liệu không hợp lệ."
+    }
+  },
+  "en": {
+    "loading": "LOADING...",
+    "score": "Score",
+    "level": "Level",
+    "guidanceTitle": "MISSION",
+    "guidance": "Move the gum jar (Lotte Xylitol) back and forth on the screen, and the gum will automatically be shot from the jar.\nIf you don't shoot the bacteria in time and the screen fills up with bacteria, you will immediately lose the game.",
+    "resultTxt01": "Thank you for participating in",
+    "resultTxt02": "LOTTE XYLITOL'S PROGRAM",
+    "resultTxt03": "Don't forget to follow the website to receive the results and exciting information from Lotte Xylitol.",
+    "errors": {
+      "RUN_OUT_OF_TURNS": "You have run out of turns.",
+      "GAME_NOT_FOUND": "Unable to retrieve game information.",
+      "GAME_ALREADY_STARTED": "Your turn has already started. Please try again after 2 minutes.",
+      "UNABLE_GET_USER": "Unable to retrieve user information.",
+      "INVALID_DATA": "The data is invalid."
+    }
+  }
+}

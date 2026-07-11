@@ -1,0 +1,420 @@
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/game-api/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/game-api/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/game-api/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/game-api/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/game-api/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/game-api/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/game-api/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/game-api/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/game-api/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: http://xylitol:xylitol335@127.0.0.1/game-api/public/index.php/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: https://xylitol:xylitol335@lottexylitol.com.vn/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: https://lottexylitol.com.vn/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------
+1. Start Request: https://lottexylitol.com.vn/api/game
+2. Response Code: 404
+3. Response Body: 
+
+
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+     
+----------------
+ERROR: API Error 404: 
+
+
+
+
+    
+    
+    
+    
+----------------

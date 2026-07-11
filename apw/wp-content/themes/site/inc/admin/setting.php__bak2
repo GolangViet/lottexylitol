@@ -1,0 +1,371 @@
+<?php
+defined('ABSPATH') or die();
+
+function site_admin_enqueue_scripts()
+{
+	$url = get_template_directory_uri(). '/assets/';
+
+	wp_enqueue_style( 'admin', 	$url. 'css/admin.css' );
+	wp_enqueue_script( 'admin', $url. 'js/admin.js', array('jquery', 'jquery-ui-sortable'), '', true );
+}
+add_action( 'admin_enqueue_scripts', 'site_admin_enqueue_scripts' );
+
+/**
+ * Menu: Settings -> Reading
+ * 
+ * wp-admin/options-reading.php
+ */
+function site_admin_options_reading()
+{
+	/**
+	 * Heading: site
+	 */
+	add_settings_field(
+		'heading_custom',
+		'<h2 id="site-settings">' . __( 'Site Settings', 'site' ) . ':</h2>',
+		function(){ echo ''; },
+		'reading',
+		'default',
+		array()
+	);
+	
+	/**
+	 * field: survey_id
+	 */
+	register_setting(
+		'reading',
+		'survey_id'
+	);
+
+	add_settings_field(
+		'survey_id',
+		__( 'Survey User', 'site' ),
+		function(){
+            $id = get_option('survey_id');
+
+            $list = get_posts([
+                'post_type' => 'survey'
+            ]);
+
+			$output = '<select type="number" id="survey_id" name="survey_id">' . "\n";
+            $output .= '<option value="">-- ' . __('Select Survey', 'site') . " --</option>\n";            
+            foreach($list as $p) {
+                $output .= '<option value="'.$p->ID.'" '.selected( $id, $p->ID, false ).'>' . $p->post_title . "</option>\n";
+            }            
+            echo $output . '</select>' . "\n";
+		},
+		'reading',
+		'default',
+		array( 'label_for' => 'survey_id' )
+	);
+	// End `survey_id`
+
+	/**
+	 * field: survey_id_en
+	 */
+	register_setting(
+		'reading',
+		'survey_id_en'
+	);
+
+	add_settings_field(
+		'survey_id_en',
+		__( 'Survey User (EN)', 'site' ),
+		function(){
+            $id = get_option('survey_id_en');
+
+            $list = get_posts([
+                'post_type' => 'survey'
+            ]);
+
+			$output = '<select type="number" id="survey_id_en" name="survey_id_en">' . "\n";
+            $output .= '<option value="">-- ' . __('Select Survey', 'site') . " --</option>\n";            
+            foreach($list as $p) {
+                $output .= '<option value="'.$p->ID.'" '.selected( $id, $p->ID, false ).'>' . $p->post_title . "</option>\n";
+            }            
+            echo $output . '</select>' . "\n";
+		},
+		'reading',
+		'default',
+		array( 'label_for' => 'survey_id_en' )
+	);
+	// End `survey_id_en`
+
+	/**
+	 * fields: survey_start, survey_stop
+	 */
+	// register_setting(
+	// 	'reading',
+	// 	'survey_start'
+	// );
+	// register_setting(
+	// 	'reading',
+	// 	'survey_stop'
+	// );
+
+	// add_settings_field(
+	// 	'survey_time',
+	// 	__( 'Survey User - Time', 'site' ),
+	// 	function(){
+    //         $survey_start = get_option('survey_start');
+    //         $survey_stop = get_option('survey_stop');
+			
+	// 		echo ' <label>' . __( 'From', 'site' ) . '</label> ';
+    //         echo '<input type="date" id="survey_start" name="survey_start" value="'.esc_attr($survey_start).'">';
+
+	// 		echo ' <label>' . __( 'To', 'site' ) . '</label> ';
+    //         echo '<input type="date" id="survey_stop" name="survey_stop" value="'.esc_attr($survey_stop).'">' . "\n";
+	// 	},
+	// 	'reading',
+	// 	'default',
+	// 	array( 'label_for' => 'survey_time' )
+	// );
+	// End survey time
+
+	/**
+	 * field: survey_brand_id
+	 */
+	register_setting(
+		'reading',
+		'survey_brand_id'
+	);
+
+	add_settings_field(
+		'survey_brand_id',
+		__( 'Brand Ambassador', 'site' ),
+		function(){
+            $id = get_option('survey_brand_id');
+
+            $list = get_posts([
+                'post_type' => 'survey'
+            ]);
+
+			$output = '<select type="number" id="survey_brand_id" name="survey_brand_id">' . "\n";
+            $output .= '<option value="">-- ' . __('Select Survey', 'site') . " --</option>\n";            
+            foreach($list as $p) {
+                $output .= '<option value="'.$p->ID.'" '.selected( $id, $p->ID, false ).'>' . $p->post_title . "</option>\n";
+            }            
+            echo $output . '</select>' . "\n";
+		},
+		'reading',
+		'default',
+		array( 'label_for' => 'survey_brand_id' )
+	);
+	// End `survey_brand_id`
+
+	/**
+	 * field: survey_brand_id_en
+	 */
+	register_setting(
+		'reading',
+		'survey_brand_id_en'
+	);
+
+	add_settings_field(
+		'survey_brand_id_en',
+		__( 'Brand Ambassador (EN)', 'site' ),
+		function(){
+            $id = get_option('survey_brand_id_en');
+
+            $list = get_posts([
+                'post_type' => 'survey'
+            ]);
+
+			$output = '<select type="number" id="survey_brand_id_en" name="survey_brand_id_en">' . "\n";
+            $output .= '<option value="">-- ' . __('Select Survey', 'site') . " --</option>\n";            
+            foreach($list as $p) {
+                $output .= '<option value="'.$p->ID.'" '.selected( $id, $p->ID, false ).'>' . $p->post_title . "</option>\n";
+            }            
+            echo $output . '</select>' . "\n";
+		},
+		'reading',
+		'default',
+		array( 'label_for' => 'survey_brand_id_en' )
+	);
+	// End `survey_brand_id_en`
+
+	/**
+	 * fields: survey_brand_start, survey_brand_stop
+	 */
+	// register_setting(
+	// 	'reading',
+	// 	'survey_brand_start'
+	// );
+	// register_setting(
+	// 	'reading',
+	// 	'survey_brand_stop'
+	// );
+
+	// add_settings_field(
+	// 	'survey_brand_time',
+	// 	__( 'Brand Ambassador - Time', 'site' ),
+	// 	function(){
+    //         $survey_brand_start = get_option('survey_brand_start');
+    //         $survey_brand_stop = get_option('survey_brand_stop');
+			
+	// 		echo ' <label>' . __( 'From', 'site' ) . '</label> ';
+    //         echo '<input type="date" id="survey_brand_start" name="survey_brand_start" value="'.esc_attr($survey_brand_start).'">';
+	// 		echo ' ' . __( 'To', 'site' ) . ' ';
+    //         echo '<input type="date" id="survey_brand_stop" name="survey_brand_stop" value="'.esc_attr($survey_brand_stop).'">' . "\n";
+	// 	},
+	// 	'reading',
+	// 	'default',
+	// 	array( 'label_for' => 'survey_brand_time' )
+	// );
+	// End survey brand time
+
+	/**
+	 * fields: contest_start, contest_stop
+	 */
+	// register_setting(
+	// 	'reading',
+	// 	'contest_start'
+	// );
+	// register_setting(
+	// 	'reading',
+	// 	'contest_stop'
+	// );
+
+	// add_settings_field(
+	// 	'contest_time',
+	// 	__( 'Photo Contest - Time', 'site' ),
+	// 	function(){
+    //         $contest_start = get_option('contest_start');
+    //         $contest_stop = get_option('contest_stop');
+			
+	// 		echo ' <label>' . __( 'From', 'site' ) . '</label> ';
+    //         echo '<input type="date" id="contest_start" name="contest_start" value="'.esc_attr($contest_start).'">';
+	// 		echo ' ' . __( 'To', 'site' ) . ' ';
+    //         echo '<input type="date" id="contest_stop" name="contest_stop" value="'.esc_attr($contest_stop).'">' . "\n";
+	// 	},
+	// 	'reading',
+	// 	'default',
+	// 	array( 'label_for' => 'contest_time' )
+	// );
+	// End contest
+
+	/**
+	 * fields: game_start, game_stop
+	 */
+	// register_setting(
+	// 	'reading',
+	// 	'game_start'
+	// );
+	// register_setting(
+	// 	'reading',
+	// 	'game_stop'
+	// );
+
+	// add_settings_field(
+	// 	'game_time',
+	// 	__( 'Game - Time', 'site' ),
+	// 	function(){
+    //         $game_start = get_option('game_start');
+    //         $game_stop = get_option('game_stop');
+			
+	// 		echo ' <label>' . __( 'From', 'site' ) . '</label> ';
+    //         echo '<input type="date" id="game_start" name="game_start" value="'.esc_attr($game_start).'">';
+	// 		echo ' ' . __( 'To', 'site' ) . ' ';
+    //         echo '<input type="date" id="game_stop" name="game_stop" value="'.esc_attr($game_stop).'">' . "\n";
+	// 	},
+	// 	'reading',
+	// 	'default',
+	// 	array( 'label_for' => 'game_time' )
+	// );
+
+	// register_setting(
+	// 	'reading',
+	// 	'game_number_of_times'
+	// );
+
+	// add_settings_field(
+	// 	'game_number_of_times',
+	// 	__( 'Game - Number of times', 'site' ),
+	// 	function(){
+    //         $value = get_option('game_number_of_times');
+
+    //         echo '<input type="number" id="game_number_of_times" name="game_number_of_times" value="'.esc_attr($value).'">';
+	// 	},
+	// 	'reading',
+	// 	'default',
+	// 	array( 'label_for' => 'game_number_of_times' )
+	// );
+	// End game
+}
+add_action( 'admin_init', 'site_admin_options_reading', 10, 2 );
+
+function site_admin_setting_get_values($option_name = '')
+{
+	$values = [];
+
+	if(get_option($option_name, 0) > 0) {
+		$values[] = get_option($option_name, 0);
+	}
+	
+	if(get_option($option_name . '_en', 0) > 0) {
+		$values[] = get_option($option_name . '_en', 0);
+	}
+
+	return $values;
+}
+
+function site_admin_register_setting_winner()
+{
+	/**
+	 * field: winner_id
+	 */
+	register_setting(
+		'reading',
+		'winner_id'
+	);
+
+	add_settings_field(
+		'winner_id',
+		__( 'Winner Page', 'site' ),
+		function(){
+            $id = get_option('winner_id');
+
+            $list = get_pages();
+
+			$output = '<select type="number" id="winner_id" name="winner_id">' . "\n";
+            $output .= '<option value="">-- ' . __('Select Page', 'site') . " --</option>\n";            
+            foreach($list as $p) {
+                $output .= '<option value="'.$p->ID.'" '.selected( $id, $p->ID, false ).'>' . $p->post_title . "</option>\n";
+            }            
+            echo $output . '</select>' . "\n";
+		},
+		'reading',
+		'default',
+		array( 'label_for' => 'winner_id' )
+	);
+	// End `winner_id`
+
+	/**
+	 * field: winner_id_en
+	 */
+	register_setting(
+		'reading',
+		'winner_id_en'
+	);
+
+	add_settings_field(
+		'winner_id_en',
+		__( 'Winner Page (EN)', 'site' ),
+		function(){
+            $id = get_option('winner_id_en');
+
+            $list = get_pages();
+
+			$output = '<select type="number" id="winner_id_en" name="winner_id_en">' . "\n";
+            $output .= '<option value="">-- ' . __('Select Page', 'site') . " --</option>\n";            
+            foreach($list as $p) {
+                $output .= '<option value="'.$p->ID.'" '.selected( $id, $p->ID, false ).'>' . $p->post_title . "</option>\n";
+            }            
+            echo $output . '</select>' . "\n";
+		},
+		'reading',
+		'default',
+		array( 'label_for' => 'winner_id_en' )
+	);
+	// End `winner_id_en`
+}

@@ -1,0 +1,231 @@
+<?php
+
+$file = dirname(__DIR__) . '/apw/wp-load.php';
+if (!file_exists($file)) die('hi');
+
+if(empty($_GET['rate'])) {
+    header('Location: ?rate=4');
+    exit();
+}
+
+// /** Make sure that the WordPress bootstrap has run before continuing. */
+require_once($file);
+
+$rate = isset($_GET['rate']) ? (int) $_GET['rate'] : 9;
+$total = isset($_GET['total']) ? (int) $_GET['total'] : 600;
+$start = isset($_GET['start']) ? (int) $_GET['start'] : 0;
+$won = isset($_GET['won']) ? (int) $_GET['won'] : 1;
+
+if($won < 1) $won = 1;
+if($rate < 1) $rate = 1;
+if($total < 2) $total = $rate + $won;
+
+echo '<meta charset="UTF-8">';
+echo "<h3>Tỉ lệ: $rate (Chúc may mắn lần sau) - $won trúng giải (ngẫu nhiên trong danh sách):</h3>\n";
+echo "<p>Tổng quà: $total </p>\n";
+
+$list = gift_random_by_rate_total($rate, $won, $total);
+
+$values = [];
+
+$i = 0;
+
+foreach ($list as $value) {
+    if($value == 1) {
+        echo ($i + 1 + $start) . ' - Trúng giải [prize] ' . "<br>\n";
+        
+        $values[] = $i + $start;
+    } else {
+        echo ($i + 1 + $start) . ' - ' . "<br>\n";
+    }
+
+    $i++;
+    if($i % ($rate + $won) == 0) {
+        echo "<hr>\n";
+    }
+}
+
+echo '<h3>Còn lại là Chúc may mắn lần sau!</h3>';
+
+echo '<br><br>';
+
+$tbl_name = 'lot_lucky_random';
+// $tbl_name = 'stg_lucky_random';
+
+// echo "INSERT INTO `$tbl_name` (`result_id`, `gift_id`) VALUES \n" . implode(",\n", $values) . ';';
+
+$content = '
+        /** 
+         * list random by rate '.$rate.' / '.$won.'
+         * date: '.date("Y-m-d H:i:s").'
+         */
+        $list = [ '. implode(", ", $values) .' ];
+';
+
+echo '<textarea style="width: 90vw; height: 500px;" onfocus="this.select()">'.$content.'</textarea>';
+
+// file_put_contents(__DIR__ . '/list-new.log', $content);
+
+/** gift_random functions */
+
+function gift_random_by_rate_total($rate = 9, $won = 1, $total_prize = 0)
+{
+    $values = [];
+
+    $half = intval($rate / 2);
+
+    // khong trung giai
+    for($i = 0; $i < $rate; $i++) {
+        $values[] = 0;
+        
+        // trung giai
+        if($i == $half) {
+            for($j = 0; $j < $won; $j++) {
+                $values[] = 1;
+            }
+        }
+    }
+
+    $list = [];
+    
+    $count_prize = 0;
+
+    while($count_prize < $total_prize) {
+        $length = count($list);
+
+        foreach($values as $value) {
+            if($count_prize < $total_prize) {
+                $list[] = $value;
+            }
+
+            if($value == 1) {
+                $count_prize++;
+            }
+        }
+
+        // Giu khoang cach giua cac khuc
+        if(count($values) > 3) {
+            $list = gift_random_list($list, $length + 1, count($list) - 1);
+        } else {
+            $list = gift_random_list($list, $length);
+        }
+    }
+
+    return $list;
+}
+
+function gift_random_by_rate($gifts = [], $rate = 9)
+{
+    // $rate = 9; // (1 trung qua / 9 chuc may man)
+    
+    $gift_try_again = [];
+
+    $prizes = [];
+
+    foreach ($gifts as $gift) {
+        if($gift['title'] == 'try again') {
+            $gift_try_again = $gift;
+        } else {
+            $gift['won'] = 0;
+
+            $prizes[] = $gift;
+        }
+    }
+
+    if(empty($gift_try_again['title'])) return [];
+
+    $list = [];
+
+    $count = 0;
+
+    $rate += 1; // +1 trung giai
+
+    while($count < $rate) {
+        $count++;
+
+        if($count == $rate) {
+            $count = 0;
+
+            $list_tickets = [];
+
+            foreach ($prizes as $id => $prize) {
+                for($i = $prize['won']; $i < $prize['total']; $i++) {
+                    $list_tickets[] = $id;
+                }
+            }
+
+            $total = count($list_tickets);
+
+            if($total == 0) {
+                $list[] = $gift_try_again;
+                
+                break;
+            }
+
+            $index = $list_tickets[rand(0, $total - 1)];
+
+            $prizes[$index]['won'] += 1;
+
+            $list[] = $prizes[$index];
+
+            $list = gift_random_list($list, count($list) - $rate);
+        } else {
+            $list[] = $gift_try_again;
+        }
+    }
+
+    return $list;
+}
+
+function gift_random_by_total($gifts)
+{
+    $list = [];
+
+    foreach ($gifts as $gift) {
+        for ($i = 0; $i < $gift['total']; $i++) {
+            $list[] = $gift;
+        }
+    }
+
+    return gift_random_list($list);
+}
+
+function gift_random_list($list = [], $start = 0, $stop = 0)
+{
+    $total = count($list);
+
+    if($total < 2) {
+        return $list;
+    }
+
+    if($stop < 1 || $stop > $total) {
+        $stop = $total;
+    }
+
+    if($start > $total) {
+        $start = $total - 2;
+    }
+    
+    if($start < 0){
+        $start = 0;
+    }
+
+    $text = '';
+
+    for ($i = $start; $i < $stop - 1; $i++) {
+        $j = rand($i, $stop - 1);
+
+        $text .= $j . '|';
+
+        if ($j != $i) {
+            
+            $tmp = $list[$i];
+            $list[$i] = $list[$j];
+            $list[$j] = $tmp;
+        }
+    }
+
+    // echo "start: $start - stop: $stop - rand: $text<br>";
+
+    return $list;
+}

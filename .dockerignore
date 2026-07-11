@@ -1,0 +1,22 @@
+.git
+.gitlab
+.idea
+.vscode
+
+node_modules
+vendor
+
+# This repo intentionally ignores composer.lock. Exclude it from build context
+# so stale local lock files do not break `composer install` during docker build.
+composer.lock
+
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+
+.env
+.env.*
+
+docker/postgres/postgres-data
+docker/mysql/database

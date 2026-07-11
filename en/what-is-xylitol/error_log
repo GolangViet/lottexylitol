@@ -1,0 +1,2 @@
+[02-Feb-2025 08:52:40 UTC] PHP Warning:  Undefined array key "HTTP_USER_AGENT" in /home/lottexylitolcom/public_html/libs/ua.class.php on line 6
+[02-Feb-2025 08:52:40 UTC] PHP Deprecated:  mb_strtolower(): Passing null to parameter #1 ($string) of type string is deprecated in /home/lottexylitolcom/public_html/libs/ua.class.php on line 6
