@@ -77,7 +77,18 @@ $redirect_to = $lotte_api->get_var('redirect_to', '/en/activity-page/');
                     <?php endif ?>
                     <div class="form-group">
                         <label for="inputAddress" class="control-label">Address</label>
-                        <input type="text" data-field="address" class="form-control" id="inputAddress" placeholder="Enter your address" data-error="Please enter an address" required>
+                        <input
+                            required
+                            type="text"
+                            data-field="address"
+                            class="form-control js-trim-space"
+                            id="inputAddress"
+                            placeholder="Enter your address"
+                            data-minlength="1"
+                            data-minlength-error="At least 1 characters."
+                            data-maxlength="255"
+                            data-maxlength-error="Maximum 255 characters."
+                            data-error="Please enter an address" />
                         <div class="help-block with-errors"></div>
                     </div>
                     <div class="form-group" id="city">

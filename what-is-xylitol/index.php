@@ -29,26 +29,26 @@ include(APP_PATH.'libs/head.php');
                     <p class="text">Bạn đã bao giờ tự hỏi xylitol là gì và liệu nó có an toàn cho cơ thể chúng ta không? Hãy cùng khám phá những điều thú vị về chất tạo ngọt tự nhiên này và cách nó giúp bảo vệ răng miệng của chúng ta.</p>
                     <p class="leaf1"><img src="<?php echo APP_ASSETS; ?>img/what/img_leaf1.png" alt="leaf"></p>
                 </div>
-                
+
                 <div class="whatgum">
                 	<p class="bgdot">&nbsp;</p>
                 	<p class="bg wow fadeInRight">&nbsp;</p>
                     <div class="section">
-                    	<div class="desc desc-head wow fadeIn" data-wow-delay="1.5s">
+                    	<div class="desc desc-head wow fadeIn" data-wow-delay="1s">
                             <h3 class="bHead wow fadeIn">Thông tin cơ bản về “Xylitol”.<br> Bạn có biết?</h3>
                         </div>
-                        <ul class="wow fadeIn" data-wow-delay="1s">
+                        <ul class="wow fadeIn" data-wow-delay="0.7s">
                             <li class="item1"><img src="<?php echo APP_ASSETS; ?>img/what/img_what1.jpg" alt="Xylitol"></li>
                         </ul>
                     </div>
                     <p class="leaf2 wow fadeIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/what/img_leaf2.png" alt="leaf"></p>
                 </div>
-                
+
                 <div>
                 	<p class="bgdot">&nbsp;</p>
                 	<p class="bg wow fadeInRight">&nbsp;</p>
                     <div class="section section-text">
-                    <div class="wow fadeIn" data-wow-delay="1.5s">
+                    <div class="wow fadeIn" data-wow-delay="1s">
                     	    <h3 class="bHead wow fadeIn">“Xylitol” là chất tạo ngọt chiết xuất từ thiên nhiên</h3>
                     	    <p class="wow fadeIn u-pb-40 u-sp-pb-20">Xylitol là chất làm ngọt tự nhiên được tìm thấy trong nhiều loại trái cây và rau quả. Ví dụ, dâu tây chứa khoảng 300 mg xylitol trên 100 gam trọng lượng khô. Trong cơ thể con người, gan cũng sản xuất khoảng 15 gam xylitol mỗi ngày</p>
                     	    <h3 class="bHead wow fadeIn">Xylitol an toàn cho cơ thể con người</h3>

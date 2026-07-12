@@ -93,7 +93,7 @@ include(APP_PATH.'libs/head.php');
                         <li style="padding-top:50px;"><img src="<?php echo APP_ASSETS; ?>img/product/img_watermelon3.png" alt=""><span>Handy Bottle ～Lifestyle Ver<em>55.1g</em></span></li>
                     </ul>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_watermelon.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_watermelon_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_watermelon.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_watermelon_sp.png" alt="" class="sp"></p>
             </div> -->
 
             <div class="prodSet2 lime"><p class="myAn" id="an1">&nbsp;</p>
@@ -112,7 +112,7 @@ include(APP_PATH.'libs/head.php');
                         <li><img src="<?php echo APP_ASSETS; ?>img/product/img_lime8.png" alt=""><span>Mini Bottle<em>26.1g</em></span></li>
                     </ul>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_lime.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_lime_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_lime.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_lime_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 fresh"><p class="myAn" id="an2">&nbsp;</p>
@@ -125,7 +125,7 @@ include(APP_PATH.'libs/head.php');
                         <li><img src="<?php echo APP_ASSETS; ?>img/product/img_fresh3.png" alt=""><span>Family Bottle<em>130.5g</em></span></li>
                     </ul>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_fresh.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_fresh_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_fresh.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_fresh_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 strawberry"><p class="myAn" id="an3">&nbsp;</p>
@@ -138,7 +138,7 @@ include(APP_PATH.'libs/head.php');
                         <li><img src="<?php echo APP_ASSETS; ?>img/product/img_strawberry2.png" alt=""><span>Handy Bottle<em>55.1g</em></span></li>
                     </ul>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_strawberry.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_strawberry_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_strawberry.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_strawberry_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 blueberry"><p class="myAn" id="an4">&nbsp;</p>
@@ -155,7 +155,7 @@ include(APP_PATH.'libs/head.php');
                         <li><img src="<?php echo APP_ASSETS; ?>img/product/img_blueberry6.png" alt=""><span>Pillow Bag<em>319g</em></span></li>
                     </ul>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_blueberry.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_blueberry_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_blueberry.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_blueberry_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 cool"><p class="myAn" id="an5">&nbsp;</p>
@@ -172,7 +172,7 @@ include(APP_PATH.'libs/head.php');
                         <li><img src="<?php echo APP_ASSETS; ?>img/product/img_cool6.png" alt=""><span>Pillow Bag<em>319g</em></span></li>
                     </ul>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_cool.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_cool_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_cool.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_cool_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 assorted"><p class="myAn" id="an6">&nbsp;</p>
@@ -185,7 +185,7 @@ include(APP_PATH.'libs/head.php');
                     	<li><img src="<?php echo APP_ASSETS; ?>img/product/img_assorted1.png" alt=""><span>Family Bottle<em>130.5g</em></span></li>
                     </ul>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_assorted.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_assorted_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_assorted.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_assorted_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 melon"><p class="myAn" id="an7">&nbsp;</p>
@@ -197,7 +197,7 @@ include(APP_PATH.'libs/head.php');
                     	<li><img src="<?php echo APP_ASSETS; ?>img/product/img_melon.png" width="120" alt=""><span>Handy Bottle<em>55.1g</em></span></li>
                     </ul>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_melon.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_melon_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_melon.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_melon_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 tablet_straw"><p class="myAn" id="an7">&nbsp;</p>
@@ -216,7 +216,7 @@ include(APP_PATH.'libs/head.php');
                         <img src="<?php echo APP_ASSETS; ?>img/product/note-doraemon.png" alt="" class="note">
                     </div>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_tablet_straw.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_tablet_straw_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_tablet_straw.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_tablet_straw_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 tablet_grape"><p class="myAn" id="an8">&nbsp;</p>
@@ -235,7 +235,7 @@ include(APP_PATH.'libs/head.php');
                         <img src="<?php echo APP_ASSETS; ?>img/product/note-doraemon.png" alt="" class="note">
                     </div>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_tablet_grape.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_tablet_grape_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_tablet_grape.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_tablet_grape_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 doraemon_grape"><p class="myAn" id="an11">&nbsp;</p>
@@ -256,7 +256,7 @@ include(APP_PATH.'libs/head.php');
                         <img src="<?php echo APP_ASSETS; ?>img/product/note-doraemon.png" alt="" class="note">
                     </div>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_grape.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_grape_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_grape.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_grape_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 doraemon_straw"><p class="myAn" id="an9">&nbsp;</p>
@@ -276,7 +276,7 @@ include(APP_PATH.'libs/head.php');
                         <img src="<?php echo APP_ASSETS; ?>img/product/note-doraemon.png" alt="" class="note">
                     </div>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_straw.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_straw_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_straw.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_straw_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 doraemon_straw2"><p class="myAn" id="an10">&nbsp;</p>
@@ -291,7 +291,7 @@ include(APP_PATH.'libs/head.php');
                         <img src="<?php echo APP_ASSETS; ?>img/product/note-doraemon.png" alt="" class="note">
                     </div>
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_straw2.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_straw2_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_straw2.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_doraemon_straw2_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="prodSet2 pokemon_straw"><p class="myAn" id="an12">&nbsp;</p>
@@ -309,7 +309,7 @@ include(APP_PATH.'libs/head.php');
                     </ul>
                     <img src="<?php echo APP_ASSETS; ?>img/product/note-pokemon.png" alt="" class="note">
                 </div>
-                <p class="pic wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_pokemon_straw.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_pokemon_straw_sp.png" alt="" class="sp"></p>
+                <p class="pic wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/product/pic_pokemon_straw.png" alt="" class="pc"><img src="<?php echo APP_ASSETS; ?>img/product/pic_pokemon_straw_sp.png" alt="" class="sp"></p>
             </div>
 
             <div class="btn-flex">

@@ -58,9 +58,8 @@ $lang_urls = [
 ];
 
 /* set language link */
-$curr_url = explode("/","$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
 $lang = $segments[0] ?? '';
-$folder = isset($lang[1]) ? trim($lang[1]) : '';
+$folder = isset($segments[1]) ? trim($segments[1]) : '';
 if($lang == 'en' || $folder == 'en') {
 	$html_lang = 'en';
 	$alter_lang = 'vi';

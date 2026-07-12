@@ -78,10 +78,15 @@ function site_api_user_signup($args = [])
         unset($rules['code']);
     }
 
+    $isValidPhone = isValidVietnamPhone($data['phone'] ?? '');
+    if (!$isValidPhone) {
+        return ['code' => 401, 'error' => 'Số điện thoại không hợp lệ', 'message' => 'User signup fail'];
+    }
+
     $errors = site_validation_data($data, $rules);
 
     if (count($errors) == 0) {
-        
+
         // $response = site_api_user_phone_verify($data);
         // if($response['code'] != 200) {
         //     return $response;
@@ -103,14 +108,14 @@ function site_api_user_signup($args = [])
             $answers['survey_id'] = get_option($option_name, 0);
 
             $valid = site_answer_validate_data($answers);
-    
+
             if(isset($valid['errors'])) {
                 $response = [
                     'code' => 401,
                     'error' => $valid['errors'],
                     'message' => 'Request fail'
                 ];
-    
+
                 return $response;
             }
         }
@@ -122,7 +127,7 @@ function site_api_user_signup($args = [])
                 $utm[$key] = $value;
             }
         }
-        
+
         if(count($utm)>0) {
             $data['utm'] = http_build_query($utm, '', '&');
         }
@@ -148,7 +153,7 @@ function site_api_user_signup($args = [])
             } else {
                 $jwt_response = site_jwt_auth_create_token($user);
             }
-            
+
             if($jwt_response['code'] == 200) {
                 $jwt_token = $jwt_response['jwt_token'];
             }
@@ -250,7 +255,7 @@ function site_api_user_update($args = [])
         $args['ID'] = $user->ID;
 
         site_user_update($args);
-        
+
         $updated = [];
 
         foreach($args as $key => $value) {
@@ -262,7 +267,7 @@ function site_api_user_update($args = [])
                 $updated[] = $key . '=' . $info[$key];
             }
         }
-        
+
         // user history
         site_user_history_insert_item([
             'user_id'   => $user->ID,
@@ -292,7 +297,7 @@ function site_api_user_get_info()
     $response = site_api_game_update($user);
 
     $info = site_user_get_info($user, 'info');
-    
+
     $response = [
         'code' => 200,
         'user' => $info,
@@ -356,7 +361,7 @@ function site_api_user_insert_gift($args = [])
         $user = site_api_get_current_user();
 
         $user_point = (int) get_user_meta($user->ID, 'point', true);
-        
+
         // check user point
         $gift_point = (int) get_post_meta($id, 'point', true);
         if($gift_point > $user_point) {
@@ -556,7 +561,7 @@ function site_api_user_insert_contest($args = [])
     if($args['url'] == '' || site_validation_url($args['url']) == false) {
         $errors['url'] = 'Incorrect URL';
     }
-    
+
     $user = site_api_get_current_user();
 
     $time = current_time('U');
@@ -583,7 +588,7 @@ function site_api_user_insert_contest($args = [])
         if ($post_id > 0) {
             $value = site_user_get_new_expires('contest'); // Expires v1.1
             update_user_meta($user->ID, 'contest_expires', $value);
-            
+
             $contest_count = (int) get_user_meta($user->ID, 'contest_count', true);
             update_user_meta($user->ID, 'contest_count', $contest_count + 1);
 
@@ -652,14 +657,14 @@ function site_api_user_forgot($args = [])
             } else {
                 $message = sprintf("Chào %s,\n\nChúng tôi đã nhận được yêu cầu của bạn về mã sử dụng một lần để sử dụng với tài khoản của bạn.\n\nMã sử dụng một lần của bạn là: %s.\n\nNếu bạn không yêu cầu mã này, bạn có thể bỏ qua email này một cách an toàn. Có thể người khác đã nhập nhầm địa chỉ email của bạn.\n\nCảm ơn", $email, $code);
             }
-    
+
             $subject = __('Reset password', 'site');
 
             if(wp_mail($email, $subject, $message)) {
                 $response = [
                     'code' => 200,
                     'message' => 'Request success'
-                ];    
+                ];
             } else {
                 $response = [
                     'code'    => 401,

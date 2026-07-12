@@ -291,13 +291,37 @@
                     });
                 }
 
+                let phone = $('[data-field="phone"]', $form);
+                function validatePhone(showError = true) {
+                    const phoneValue = api.normalizeVietnamPhone(phone.val());
+                    phone.val(phoneValue);
+                    if (!phoneValue) {
+                        phone.removeClass('has-error');
+
+                        return false;
+                    }
+
+                    const valid = api.isValidVietnamPhone(phoneValue);
+                    phone.toggleClass('has-error', !valid);
+                    phone.closest('.form-group, .form-field, .field').toggleClass('has-error', !valid);
+                    api.show_form_group_error(phone, '');
+                    if (!valid && showError) {
+                        api.show_form_group_error(phone, phone.data('error'));
+                    }
+
+                    return valid;
+                }
+
+                phone.on('blur change', function () {
+                    validatePhone(true);
+                });
+
                 $("#phone-verify").each(function () {
                     let pv = $(this);
-
-                    let phone = $('[data-field="phone"]').on('change', function () {
-                        pv.toggleClass('u-hidden', phone.closest('.has-error').length > 0);
-
-                        $('#box-verify-phone [data-field="phone"]').val(phone.val());
+                    phone.on('change', function () {
+                        const valid = validatePhone(false);
+                        pv.toggleClass('u-hidden', !valid);
+                        $('#box-verify-phone [data-field="phone"]').val(api.normalizeVietnamPhone(phone.val()));
                     });
 
                     /*
@@ -324,6 +348,16 @@
 
                 $form.on('submit', function (e) {
                     e.preventDefault();
+
+                    const phoneValue = api.normalizeVietnamPhone(phone.val());
+                    if (!api.isValidVietnamPhone(phoneValue)) {
+                        phone.focus();
+                        phone.toggleClass('has-error', true);
+                        phone.closest('.form-group, .form-field, .field').toggleClass('has-error', true);
+                        api.show_form_group_error(phone, phone.data('error'));
+
+                        return false;
+                    }
 
                     setTimeout(function(){
                         let data = api.get_data($form);
@@ -361,7 +395,7 @@
                                         content: $('#box-thanks')
                                     });
 
-                                    api.redirect(5000);
+                                    // api.redirect(5000);
                                 } else if (typeof response.error != undefined) {
                                     api.show_popup_error(response.error);
                                 } else {
@@ -893,6 +927,28 @@
             } else {
                 callback();
             }
+        },
+        normalizeVietnamPhone: function (value) {
+            let phone = String(value || '')
+                .trim()
+                .replace(/[\s().-]/g, '');
+
+            if (phone.startsWith('+84')) {
+                phone = '0' + phone.slice(3);
+            } else if (phone.startsWith('0084')) {
+                phone = '0' + phone.slice(4);
+            } else if (phone.startsWith('84') && phone.length === 11) {
+                phone = '0' + phone.slice(2);
+            }
+
+            return phone;
+        },
+        isValidVietnamPhone: function (value) {
+            const phone = api.normalizeVietnamPhone(value);
+            const phoneRegex =
+                /^(?:081|082|083|084|085|088|091|094|070|076|077|078|079|089|090|093|086|032|033|034|035|036|037|038|039|096|097|098|052|056|058|092|087|055|059|099)\d{7}$/;
+
+            return phoneRegex.test(phone);
         }
     };
 
@@ -914,5 +970,20 @@
     }).on('change', function() {
         this.value = this.value.replace(new RegExp(' ', 'g'), '');
     });
+
+    $('.js-trim-space')
+        .on('keydown', function (e) {
+            const value = this.value;
+            if (e.key === ' ' && value.trim() === '') {
+                e.preventDefault();
+            }
+        })
+        .on('blur change', function () {
+            this.value = this.value.trim().replace(/\s+/g, ' ');
+        })
+        .on('paste', function (e) {
+            const input = this;
+            setTimeout(() => { input.value = input.value.trim(); }, 0);
+        });
 
 })(jQuery);

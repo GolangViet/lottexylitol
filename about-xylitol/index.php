@@ -36,7 +36,7 @@ include(APP_PATH . 'libs/head.php');
                     <span class="bgMap wow fadeInLeft" data-wow-delay="0.2s"></span>
                     <span class="bgMap2 wow fadeIn" data-wow-delay="1s"></span>
                     <div class="inner">
-                        <span class="imgProduct wow zoomIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/why/img_product.png"
+                        <span class="imgProduct wow zoomIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/why/img_product.png"
                                 alt="Xylitol Gum’s benefit that can prevent cavities has been approved by Dental Associations in many countries all over the world."></span>
                         <h2 class="wow fadeIn" data-wow-delay="1s">Lợi ích giúp ngăn ngừa sâu răng của Xylitol <br class="pc">đã được chứng nhận bởi các hiệp hội nha khoa <br class="pc">ở nhiều nước
                             trên thế giới.</h2>
@@ -67,7 +67,7 @@ include(APP_PATH . 'libs/head.php');
                         </div>
                     </div>
                     <div class="mapInfo clearfix">
-                        <p class="thumb wow fadeIn" data-wow-delay="1s"><span class="wow fadeIn" data-wow-delay="1.5s"><img src="<?php echo APP_ASSETS; ?>img/why/img_doctor.png" alt="Doctor"
+                        <p class="thumb wow fadeIn" data-wow-delay="1s"><span class="wow fadeIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/why/img_doctor.png" alt="Doctor"
                                     class="pc"><img src="<?php echo APP_ASSETS; ?>img/why/img_doctor_sp.png" alt="Lotte Xylitol" class="sp"></span></p>
                         <ul class="wow fadeIn" data-wow-delay="2s">
                             <li>

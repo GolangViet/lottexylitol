@@ -29,27 +29,27 @@ include(APP_PATH.'libs/head.php');
                     <p class="text">We will introduce basic knowledge about xylitol, from such basic questions to its power to prevent tooth decay.</p>
                     <p class="leaf1"><img src="<?php echo APP_ASSETS; ?>img/what/img_leaf1.png" alt="leaf"></p>
                 </div>
-                
+
                 <div class="whatgum">
                 	<p class="bgdot">&nbsp;</p>
                 	<p class="bg wow fadeInRight">&nbsp;</p>
                     <div class="section">
-                    	<div class="desc desc-head wow fadeIn" data-wow-delay="1.5s">
+                    	<div class="desc desc-head wow fadeIn" data-wow-delay="1s">
                             <h3 class="bHead wow fadeIn">Did you know?<br>Basic information<br>
                             about "xylitol"</h3>
                         </div>
-                        <ul class="wow fadeIn" data-wow-delay="1s">
+                        <ul class="wow fadeIn" data-wow-delay="0.7s">
                             <li class="item1"><img src="<?php echo APP_ASSETS; ?>img/what/img_what1.jpg" alt="Xylitol"></li>
                         </ul>
                     </div>
                     <p class="leaf2 wow fadeIn" data-wow-delay="1s"><img src="<?php echo APP_ASSETS; ?>img/what/img_leaf2.png" alt="leaf"></p>
                 </div>
-                
+
                 <div>
                 	<p class="bgdot">&nbsp;</p>
                 	<p class="bg wow fadeInRight">&nbsp;</p>
                     <div class="section section-text">
-                    	<div class="wow fadeIn" data-wow-delay="1.5s">
+                    	<div class="wow fadeIn" data-wow-delay="1s">
                     	    <h3 class="bHead wow fadeIn">The sweetener XYLITOL is a natural ingredient.</h3>
                     	    <p class="wow fadeIn u-pb-40 u-sp-pb-20">Xylitol is a natural sweetener found in many fruits and vegetables. For example, strawberries contain about 300 mg of Xylitol per 100 grams of dry weight. In the human body, the liver also produces about 15 grams of Xylitol per day.</p>
                     	    <h3 class="bHead wow fadeIn">Two ways xylitol prevents tooth decay.</h3>
@@ -64,7 +64,7 @@ include(APP_PATH.'libs/head.php');
                     </div>
                 </div>
             </div>
-            
+
         </main>
     </div><!-- #wrap -->
 

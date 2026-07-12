@@ -16,7 +16,7 @@ function site_validation_data($data = [], $valids = [])
                 $list = explode(':', $require);
 
                 $error = site_validation_item($value, $list[0], isset($list[1]) ? $list[1] : null);
-                
+
                 if($error != '') {
                     $errors[$field] = $error;
 
@@ -129,8 +129,8 @@ function site_validation_phone_country($value = '')
 function site_validation_password($value = '')
 {
     if (
-        preg_match('/[0-9]/', $value) 
-        && preg_match('/[a-z]/', $value) 
+        preg_match('/[0-9]/', $value)
+        && preg_match('/[a-z]/', $value)
         && preg_match('/[A-Z]/', $value)
         // && preg_match('/[!@#$%^&*]/', $value)
     ) {
@@ -150,4 +150,28 @@ function site_validation_url($value = '')
     }
 
     return false;
+}
+
+function normalizeVietnamPhone(?string $phone): string
+{
+    $phone = preg_replace('/[\s\-\(\)\.]/', '', trim($phone ?? ''));
+    if (str_starts_with($phone, '+84')) {
+        $phone = '0' . substr($phone, 3);
+    } elseif (str_starts_with($phone, '0084')) {
+        $phone = '0' . substr($phone, 4);
+    } elseif (preg_match('/^84\d{9}$/', $phone)) {
+        $phone = '0' . substr($phone, 2);
+    }
+
+    return $phone;
+}
+
+function isValidVietnamPhone(?string $phone): bool
+{
+    $phone = normalizeVietnamPhone($phone);
+
+    return (bool) preg_match(
+        '/^(081|082|083|084|085|088|091|094|070|076|077|078|079|089|090|093|086|032|033|034|035|036|037|038|039|096|097|098|052|056|058|092|087|055|059|099)\d{7}$/',
+        $phone
+    );
 }

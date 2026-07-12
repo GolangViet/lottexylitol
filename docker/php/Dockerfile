@@ -26,6 +26,8 @@ RUN apt-get update \
         --with-jpeg \
         --with-webp \
     && docker-php-ext-install -j"$(nproc)" \
+        mysqli \
+        pdo_mysql \
         gd \
         intl \
         opcache \

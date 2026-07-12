@@ -17,18 +17,23 @@
  *
  * @package WordPress
  */
+
+define('WP_HOME', 'http://localhost:8076/apw');
+
+define('WP_SITEURL', 'http://localhost:8076/apw');
+
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', "lottexylitolcom_db24" );
+define( 'DB_NAME', "lottexylitol" );
 
 /** Database username */
-define( 'DB_USER', "lottexylitolcom_us24" );
+define( 'DB_USER', "lottexylitol" );
 
 /** Database password */
-define( 'DB_PASSWORD', "Zf96UlAKND755OWLxL" );
+define( 'DB_PASSWORD', "123456xyz" );
 
 /** Database hostname */
-define( 'DB_HOST', "localhost" );
+define( 'DB_HOST', "db" );
 
 /** Database charset to use in creating database tables. */
 define( 'DB_CHARSET', 'utf8mb4' );

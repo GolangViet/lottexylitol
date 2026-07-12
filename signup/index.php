@@ -77,7 +77,18 @@ $redirect_to = $lotte_api->get_var('redirect_to', '/activity-page/');
                     <?php endif ?>
                     <div class="form-group">
                         <label for="inputAddress" class="control-label">Địa chỉ</label>
-                        <input type="text" data-field="address" class="form-control" id="inputAddress" placeholder="Nhập địa chỉ của bạn" data-error="Vui lòng nhập địa chỉ" required>
+                        <input
+                            required
+                            type="text"
+                            data-field="address"
+                            class="form-control js-trim-space"
+                            id="inputAddress"
+                            placeholder="Nhập địa chỉ của bạn"
+                            data-minlength="1"
+                            data-minlength-error="Ít nhất 1 ký tự."
+                            data-maxlength="255"
+                            data-maxlength-error="Tối đa 255 ký tự."
+                            data-error="Vui lòng nhập địa chỉ" />
                         <div class="help-block with-errors"></div>
                     </div>
                     <div class="form-group" id="city">
