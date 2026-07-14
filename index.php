@@ -10,6 +10,7 @@ if(isset($_GET['signout'])) {
 }
 
 $is_logged_in = $lotte_api->is_logged_in();
+$banners = $lotte_api->get_home_banners();
 
 include (APP_PATH . 'libs/head.php');
 ?>
@@ -25,44 +26,43 @@ include (APP_PATH . 'libs/head.php');
         <!-- Main Content
         ================================================== -->
         <main class="main">
-            <?php /*/ ?><div class="kv">
-                <img class="pc" src="<?php echo APP_ASSETS; ?>img/top/kv_pc.jpg" alt="">
-                <img class="sp" src="<?php echo APP_ASSETS; ?>img/top/kv_sp.jpg" alt="">
-            </div><?php /*/ ?>
-            <div class="visual">
-                <ul class="vslider">
-                    <li class="item slider01 item01">
-                        <p class="lazy-bg" data-animation="fadeInRight" data-delay="0s">
-                            <img src="<?php echo APP_ASSETS; ?>img/top/slider/img_kv_6_pc.webp" alt="Xylitol" class="pc">
-                            <img src="<?php echo APP_ASSETS; ?>img/top/slider/img_kv_6_sp.webp" alt="Xylitol" class="sp">
-                        </p>
-                    </li>
-                    <li class="item slider01 item01">
-                        <p class="lazy-bg" data-animation="fadeInRight" data-delay="0s">
-                            <img src="<?php echo APP_ASSETS; ?>img/top/slider/img_kv_1_pc.webp" alt="Xylitol" class="pc">
-                            <img src="<?php echo APP_ASSETS; ?>img/top/slider/img_kv_1_sp.webp" alt="Xylitol" class="sp">
-                        </p>
-                    </li>
-                    <li class="item slider01 item01">
-                        <p class="lazy-bg" data-animation="fadeInRight" data-delay="0s">
-                            <img src="<?php echo APP_ASSETS; ?>img/top/slider/img_kv_2_pc.webp" alt="Xylitol" class="pc">
-                            <img src="<?php echo APP_ASSETS; ?>img/top/slider/img_kv_2_sp.webp" alt="Xylitol" class="sp">
-                        </p>
-                    </li>
-                    <li class="item slider01 item01">
-                        <p class="lazy-bg" data-animation="fadeInRight" data-delay="0s">
-                            <img src="<?php echo APP_ASSETS; ?>img/top/slider/img_kv_3_pc.webp" alt="Xylitol" class="pc">
-                            <img src="<?php echo APP_ASSETS; ?>img/top/slider/img_kv_3_sp.webp" alt="Xylitol" class="sp">
-                        </p>
-                    </li>
-                    <li class="item slider01 item01">
-                        <p class="lazy-bg" data-animation="fadeInRight" data-delay="0s">
-                            <img src="<?php echo APP_ASSETS; ?>img/top/slider/img_kv_4_pc.webp" alt="Xylitol" class="pc">
-                            <img src="<?php echo APP_ASSETS; ?>img/top/slider/img_kv_4_sp.webp" alt="Xylitol" class="sp">
-                        </p>
-                    </li>
-                </ul>
-            </div>
+            <?php if (!empty($banners)) { ?>
+                <div class="visual">
+                    <ul class="vslider">
+                        <?php foreach ($banners as $banner) { ?>
+                            <li class="item slider01 item01">
+                                <p class="lazy-bg" data-animation="fadeInRight" data-delay="0s">
+                                    <?php if (!empty($banner['desktop_url'] ?? '')) { ?>
+                                        <a href="<?php echo $banner['desktop_url'] ?? ''; ?>" target="_blank">
+                                    <?php } ?>
+
+                                        <img
+                                            src="<?php echo $banner['desktop_image']['value']['url'] ?? ''; ?>"
+                                            alt="Xylitol"
+                                            class="pc" />
+
+                                    <?php if (!empty($banner['desktop_url'] ?? '')) { ?>
+                                        </a>
+                                    <?php } ?>
+
+                                    <?php if (!empty($banner['mobile_url'] ?? '')) { ?>
+                                        <a href="<?php echo $banner['mobile_url'] ?? ''; ?>" target="_blank">
+                                    <?php } ?>
+
+                                        <img
+                                            src="<?php echo $banner['mobile_image']['value']['url'] ?? ($banner['desktop_image']['value']['url'] ?? ''); ?>"
+                                            alt="Xylitol"
+                                            class="sp" />
+
+                                    <?php if (!empty($banner['mobile_url'] ?? '')) { ?>
+                                        </a>
+                                    <?php } ?>
+                                </p>
+                            </li>
+                        <?php } ?>
+                    </ul>
+                </div>
+            <?php } ?>
             <div class="whatSet">
                 <p class="bg1 wow fadeInRight bg-lazy">&nbsp;</p>
                 <p class="bg2 wow fadeIn bg-lazy">&nbsp;</p>

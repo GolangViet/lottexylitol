@@ -1,16 +1,12 @@
 <footer class="footer">
 	<a href="javascript:;" class="btnTop abso"><span>TOP</span></a>
+
     <?php if($show_snsBox) :?>
-	<div class="snsBox" style="display: none;">
-		<h2 class="bHead"><?php echo $txt_footer; ?></h2>
-		<div class="clearfix snsBox-flex">
-			<div class="likeBlock">
-                <div class="fb-page" data-href="{url}" data-tabs="timeline" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><div class="fb-xfbml-parse-ignore"><blockquote cite="{url}"><a href="{url}">Lotte Xylitol</a></blockquote></div></div>
-            </div>
-			<!-- <div class="commentBlock" id="js-facebook"></div> -->
-		</div>
-	</div>
+        <div class="snsBox" style="display: none;">
+            <div class="clearfix snsBox-flex"></div>
+        </div>
     <?php endif; ?>
+
 	<div class="inner">
         <ul class="clearfix fNavi">
             <li><a href="<?php echo APP_URL; ?><?php echo $lang_link; ?>what-is-xylitol/"><?php echo $footer_what; ?></a></li>
@@ -50,37 +46,14 @@
 <script src="<?php echo APP_ASSETS; ?>js/wow/wow.js"></script>
 <script src="<?php echo APP_ASSETS; ?>js/lib/webfont.js"></script>
 <script>
-$(window).load(function(){
-    setTimeout(function(){
-        if(IS_PSI === false) {
+    $(window).load(function() {
+        setTimeout(function() {
+            if (IS_PSI) {
+                return;
+            }
+
             APP_ASSETS = '<?php echo APP_ASSETS; ?>';
-              WebFont.load({
-                // load fonts from local resource
-                custom: {
-                  families: ['fonts'],
-                  urls: [APP_ASSETS + 'css/fonts.css']
-                }
-              });
-        }
-
-        function changeFBComment(){
-            $('#js-facebook').append('<div class="fb-comments" data-href="https://www.facebook.com/LotteXylitolVietnam" data-width="462" data-numposts="5"></div>');
-            FB.XFBML.parse();
-        }
-
-        function changeFBPagePlugin(width, height, url) {
-            if (!isNaN(width) && !isNaN(height)) {
-                $(".fb-page").attr("data-width", width).attr("data-height", height);
-            }
-            if (url) {
-                $(".fb-page").attr("data-href", url);
-            }
-            FB.XFBML.parse();
-        }
-
-        changeFBPagePlugin(462,480,'https://www.facebook.com/LotteXylitolVietnam');
-        // changeFBComment();
-
-    },2000)
-});
+            WebFont.load({ custom: { families: ['fonts'], urls: [APP_ASSETS + 'css/fonts.css'] } });
+        }, 2000)
+    });
 </script>

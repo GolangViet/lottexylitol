@@ -21,7 +21,9 @@ if (defined('APP_PATH') && class_exists('lotte_api') == false) :
             // --- ĐOẠN CODE FIX V2 (CẬP NHẬT) ---
             if (strpos($url, $domain) !== false) {
                 // 1. Trỏ thẳng IP
-                $url = str_replace($domain, '160.191.88.107', $url);
+                // If localhost, use 'web' from docker container that declared in docker-compose.yml
+                $replace = str_contains($domain, 'localhost') ? 'web' : '160.191.88.107';
+                $url = str_replace($domain, $replace, $url);
 
                 // 2. Ép dùng HTTP
                 $url = str_replace('https://', 'http://', $url);
@@ -163,7 +165,6 @@ if (defined('APP_PATH') && class_exists('lotte_api') == false) :
 
             // call folder api
             $response = $this->api_call($route, $data, $headers);
-
             if ($response != '') {
                 return json_decode($response, true);
             }
@@ -304,6 +305,27 @@ if (defined('APP_PATH') && class_exists('lotte_api') == false) :
             $lotte_token_data = $data;
 
             return true;
+        }
+
+        function get_home_banners()
+        {
+            global $lotte_home_banners;
+            if (isset($lotte_home_banners)) {
+                return $lotte_home_banners;
+            }
+
+            $route = '/user/home-banners';
+            if ($this->is_lang('en')) {
+                $route .= '?lang=en';
+            }
+
+            $lotte_home_banners = [];
+            $response = $this->api_request($route);
+            if (isset($response['code']) && $response['code'] == 200 && isset($response['items'])) {
+                $lotte_home_banners = $response['items'];
+            }
+
+            return $lotte_home_banners;
         }
 
         function logout()

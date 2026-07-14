@@ -99,6 +99,10 @@ function site_api_get_routes()
             'method'        => 'GET',
             // 'permission'    => 'token',
         ],[
+            'name'          => '/user/home-banners',
+            'callback'      => 'site_api_home_banner_get_items',
+            'method'        => 'GET',
+        ],[
             'name'          => '/user/answer',
             'callback'      => 'site_api_answer_survey_normal',
             'method'        => 'POST',
@@ -192,12 +196,7 @@ function site_api_get_routes()
 function site_api_request_route($pathname = '')
 {
     $routes = site_api_get_routes();
-
-    $response = [
-        'code' => 400,
-        'message' => 'Bad route'
-    ];
-
+    $response = ['code' => 400, 'message' => 'Bad route'];
     foreach ($routes as $route) {
         $method = isset($route['method']) ? strtoupper($route['method']) : '';
         $name = isset($route['name']) ? strtolower($route['name']) : '';
@@ -269,10 +268,10 @@ function site_api_response_json($response = [])
                 if(is_string($key)) {
                     $text = __($key, 'site') . ' ' . $text;
                 }
-    
+
                 $errors[] = $text;
             }
-    
+
             $response['error'] = implode(',', $errors);
         } else {
             $response['error'] = __($response['error'], 'site');
@@ -324,8 +323,8 @@ function site_api_permission_check($type = '', $role = '')
                         global $site_user;
 
                         $site_user = $user;
-    
-                        $response = true;    
+
+                        $response = true;
                     }
                 } else {
                     $response = [
@@ -367,7 +366,7 @@ function site_api_get_header($name = '')
     $name = trim($name);
     if($name != '') {
         $name = strtolower($name);
-        
+
         if (isset($headers[$name])) {
             return $headers[$name];
         }
@@ -381,7 +380,7 @@ function site_api_get_header($name = '')
 function site_api_get_current_user($type = '')
 {
     global $site_user;
-    
+
     if (isset($site_user)) {
         if($type == 'info') {
             return site_user_get_info($site_user);
