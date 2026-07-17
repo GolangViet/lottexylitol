@@ -100,14 +100,18 @@ function site_banner_get_posts($tax_slug = '')
     if ($the_query->have_posts()) {
         foreach ($the_query->posts as $p) {
             $item = [
-                'desktop_image' => '',
                 'desktop_url'   => '',
-                'mobile_image'  => '',
                 'mobile_url'    => '',
+                'vn_group'      => [],
+                'en_group'      => [],
                 'id'            => $p->ID,
                 'name'          => $p->post_title,
+                'mobile_image'  => get_field_object('mobile_image', $p->ID),
+                'desktop_image' => get_field_object('desktop_image', $p->ID),
             ];
             if (function_exists('get_field')) {
+                $item['vn_group'] = get_field('vn_group', $p->ID);
+                $item['en_group'] = get_field('en_group', $p->ID);
                 $item['mobile_image'] = get_field_object('mobile_image', $p->ID);
                 $item['desktop_image'] = get_field_object('desktop_image', $p->ID);
                 $item['mobile_url'] = (string) get_field('mobile_url', $p->ID);

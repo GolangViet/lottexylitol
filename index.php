@@ -30,31 +30,36 @@ include (APP_PATH . 'libs/head.php');
                 <div class="visual">
                     <ul class="vslider">
                         <?php foreach ($banners as $banner) { ?>
+                            <?php
+                                $bnGroup = $banner['vn_group'] ?? [];
+                                $bnDesktop = $bnGroup['desktop'] ?? [];
+                                $bnMobile = $bnGroup['mobile'] ?? [];
+                            ?>
                             <li class="item slider01 item01">
                                 <p class="lazy-bg" data-animation="fadeInRight" data-delay="0s">
-                                    <?php if (!empty($banner['desktop_url'] ?? '')) { ?>
-                                        <a href="<?php echo $banner['desktop_url'] ?? ''; ?>" target="_blank">
-                                    <?php } ?>
+                                    <?php if (!empty($bnDesktop['url'] ?? '')) { ?>
+                                        <a href="<?php echo $bnDesktop['url'] ?? ''; ?>" target="_blank">
+                                            <?php } ?>
 
-                                        <img
-                                            src="<?php echo $banner['desktop_image']['value']['url'] ?? ''; ?>"
-                                            alt="Xylitol"
-                                            class="pc" />
+                                            <img
+                                                src="<?php echo $bnDesktop['image']['url'] ?? ''; ?>"
+                                                alt="Xylitol"
+                                                class="pc" />
 
-                                    <?php if (!empty($banner['desktop_url'] ?? '')) { ?>
+                                            <?php if (!empty($bnDesktop['url'] ?? '')) { ?>
                                         </a>
                                     <?php } ?>
 
-                                    <?php if (!empty($banner['mobile_url'] ?? '')) { ?>
-                                        <a href="<?php echo $banner['mobile_url'] ?? ''; ?>" target="_blank">
-                                    <?php } ?>
+                                    <?php if (!empty($bnMobile['url'] ?? '')) { ?>
+                                        <a href="<?php echo $bnMobile['url'] ?? ''; ?>" target="_blank">
+                                            <?php } ?>
 
-                                        <img
-                                            src="<?php echo $banner['mobile_image']['value']['url'] ?? ($banner['desktop_image']['value']['url'] ?? ''); ?>"
-                                            alt="Xylitol"
-                                            class="sp" />
+                                            <img
+                                                src="<?php echo $bnMobile['image']['url'] ?? ($bnDesktop['image']['url'] ?? ''); ?>"
+                                                alt="Xylitol"
+                                                class="sp" />
 
-                                    <?php if (!empty($banner['mobile_url'] ?? '')) { ?>
+                                            <?php if (!empty($bnMobile['url'] ?? '')) { ?>
                                         </a>
                                     <?php } ?>
                                 </p>
@@ -63,6 +68,7 @@ include (APP_PATH . 'libs/head.php');
                     </ul>
                 </div>
             <?php } ?>
+
             <div class="whatSet">
                 <p class="bg1 wow fadeInRight bg-lazy">&nbsp;</p>
                 <p class="bg2 wow fadeIn bg-lazy">&nbsp;</p>
