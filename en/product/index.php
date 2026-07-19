@@ -68,35 +68,38 @@ $productCategories = $lotte_api->get_product_categories();
                     <?php if (!empty($productCategoryChildren)) { ?>
                         <?php foreach ($productCategoryChildren as $productCategoryChild) { ?>
                             <?php $productCategoryProducts = $productCategoryChild['products'] ?? []; ?>
+                            <?php $defaultProductCategoryDetail = $productCategoryChild['general']['vn_group'] ?? []; ?>
                             <?php $productCategoryDetail = $productCategoryChild['general']['en_group'] ?? []; ?>
 
                             <div class="prodSet2 <?php echo $productCategoryChild['css_class'] ?? ''; ?>">
                                 <p class="myAn" id="an<?php echo $productCategoryChild['id'] ?? 0; ?>">&nbsp;</p>
                                 <p
                                     style="
-                                    <?php echo '--product-set-background-pc: url(' . ($productCategoryDetail['desktop']['background']['url'] ?? '') . ');'; ?>
-                                    <?php echo '--product-set-background-sp: url(' . ($productCategoryDetail['mobile']['background']['url'] ?? '') . ');'; ?>
+                                    <?php echo '--product-set-background-pc: url(' . ($productCategoryDetail['desktop']['background']['url'] ?? ($defaultProductCategoryDetail['desktop']['background']['url'] ?? '')) . ');'; ?>
+                                    <?php echo '--product-set-background-sp: url(' . ($productCategoryDetail['mobile']['background']['url'] ?? ($defaultProductCategoryDetail['mobile']['background']['url'] ?? '')) . ');'; ?>
                                         "
                                     class="bg wow fadeInRight"
                                     data-wow-delay="0.5s">&nbsp;</p>
                                 <div class="section wow fadeIn" data-wow-delay="2s">
-                                    <h3 class="bHead"><?php echo $productCategoryDetail['title'] ?? '' ?></h3>
-                                    <p class="text"><?php echo $productCategoryDetail['description'] ?? '' ?></p>
+                                    <h3 class="bHead"><?php echo $productCategoryDetail['title'] ?? ($defaultProductCategoryDetail['title'] ?? ''); ?></h3>
+                                    <p class="text"><?php echo $productCategoryDetail['description'] ?? ($defaultProductCategoryDetail['description'] ?? ''); ?></p>
 
                                     <?php if (!empty($productCategoryProducts)) { ?>
                                         <ul class="prod_list">
                                             <?php foreach ($productCategoryProducts as $productItem) { ?>
+                                                <?php $defaultProductDetail = $productItem['vn_group'] ?? []; ?>
                                                 <?php $productDetail = $productItem['en_group'] ?? []; ?>
 
                                                 <li>
                                                     <img
-                                                        src="<?php echo $productDetail['thumbnail']['url'] ?? ''; ?>"
-                                                        alt="<?php echo $productDetail['title'] ?? ''; ?>" />
+                                                        style="width: 120px;"
+                                                        src="<?php echo $productDetail['thumbnail']['url'] ?? ($defaultProductDetail['thumbnail']['url'] ?? ''); ?>"
+                                                        alt="<?php echo $productDetail['title'] ?? ($defaultProductDetail['title'] ?? ''); ?>" />
                                                     <span>
-                                                        <?php echo $productDetail['title'] ?? ''; ?>
+                                                        <?php echo $productDetail['title'] ?? ($defaultProductDetail['title'] ?? ''); ?>
                                                         <em>
-                                                            <?php echo $productDetail['weight']['value'] ?? ''; ?>
-                                                            <?php echo $productDetail['weight']['unit']['value'] ?? ''; ?>
+                                                            <?php echo $productDetail['weight']['value'] ?? ($defaultProductDetail['weight']['value'] ?? ''); ?>
+                                                            <?php echo $productDetail['weight']['unit']['value'] ?? ($defaultProductDetail['weight']['unit']['value'] ?? ''); ?>
                                                         </em>
                                                     </span>
                                                 </li>
@@ -105,22 +108,22 @@ $productCategories = $lotte_api->get_product_categories();
                                         </ul>
                                     <?php } ?>
 
-                                    <?php if (!empty($productCategoryDetail['desktop']['copyright']['url'] ?? '')) { ?>
+                                    <?php if (!empty($productCategoryDetail['desktop']['copyright']['url'] ?? ($defaultProductCategoryDetail['desktop']['copyright']['url'] ?? ''))) { ?>
                                         <img
-                                            src="<?php echo $productCategoryDetail['desktop']['copyright']['url'] ?? ''; ?>"
-                                            alt="<?php echo $productCategoryDetail['title'] ?? ''; ?>"
+                                            src="<?php echo $productCategoryDetail['desktop']['copyright']['url'] ?? ($defaultProductCategoryDetail['desktop']['copyright']['url'] ?? ''); ?>"
+                                            alt="<?php echo $productCategoryDetail['title'] ?? ($defaultProductCategoryDetail['title'] ?? ''); ?>"
                                             class="note" />
                                     <?php } ?>
 
                                 </div>
                                 <p class="pic wow zoomIn" data-wow-delay="1s">
                                     <img
-                                        src="<?php echo $productCategoryDetail['desktop']['thumbnail']['url'] ?? ''; ?>"
-                                        alt="<?php echo $productCategoryDetail['title'] ?? ''; ?>"
+                                        src="<?php echo $productCategoryDetail['desktop']['thumbnail']['url'] ?? ($defaultProductCategoryDetail['desktop']['thumbnail']['url'] ?? ''); ?>"
+                                        alt="<?php echo $productCategoryDetail['title'] ?? ($defaultProductCategoryDetail['title'] ?? ''); ?>"
                                         class="pc" />
                                     <img
-                                        src="<?php echo $productCategoryDetail['mobile']['thumbnail']['url'] ?? ''; ?>"
-                                        alt="<?php echo $productCategoryDetail['title'] ?? ''; ?>"
+                                        src="<?php echo $productCategoryDetail['mobile']['thumbnail']['url'] ?? ($defaultProductCategoryDetail['mobile']['thumbnail']['url'] ?? ''); ?>"
+                                        alt="<?php echo $productCategoryDetail['title'] ?? ($defaultProductCategoryDetail['title'] ?? ''); ?>"
                                         class="sp">
                                 </p>
                             </div>

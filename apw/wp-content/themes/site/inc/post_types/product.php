@@ -41,7 +41,7 @@ function site_product_init()
         'has_archive'        => false,
         'hierarchical'       => false,
         'menu_position'      => 30,
-        'menu_icon'          => 'dashicons-format-image',
+        'menu_icon'          => 'dashicons-products',
         'supports'           => array('title'),
         'labels' => array(
             'name'                => _x('Products', 'Post Type General Name', 'site'),
