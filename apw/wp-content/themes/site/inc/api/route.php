@@ -99,6 +99,10 @@ function site_api_get_routes()
             'method'        => 'GET',
             // 'permission'    => 'token',
         ],[
+            'name'          => '/user/product-categories',
+            'callback'      => 'site_api_product_category_get_items',
+            'method'        => 'GET',
+        ],[
             'name'          => '/user/home-banners',
             'callback'      => 'site_api_home_banner_get_items',
             'method'        => 'GET',

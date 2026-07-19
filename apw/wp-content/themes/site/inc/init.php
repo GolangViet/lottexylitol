@@ -35,6 +35,7 @@ require get_theme_file_path('/inc/post_types/post.php');
 require get_theme_file_path('/inc/post_types/survey.php');
 require get_theme_file_path('/inc/post_types/winner.php');
 require get_theme_file_path('/inc/post_types/banner.php');
+require get_theme_file_path('/inc/post_types/product.php');
 
 // Translate
 require get_theme_file_path('/inc/languages/translate.php');
@@ -49,6 +50,7 @@ require get_theme_file_path('/inc/api/gift.php');
 require get_theme_file_path('/inc/api/cdp.php');
 require get_theme_file_path('/inc/api/winner.php');
 require get_theme_file_path('/inc/api/banner.php');
+require get_theme_file_path('/inc/api/product.php');
 require get_theme_file_path('/inc/api/game.php');
 require get_theme_file_path('/inc/api/page.php');
 require get_theme_file_path('/inc/api/must-buy.php');

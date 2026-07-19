@@ -328,6 +328,27 @@ if (defined('APP_PATH') && class_exists('lotte_api') == false) :
             return $lotte_home_banners;
         }
 
+        function get_product_categories()
+        {
+            global $lotte_product_categories;
+            if (isset($lotte_product_categories)) {
+                return $lotte_product_categories;
+            }
+
+            $route = '/user/product-categories';
+            if ($this->is_lang('en')) {
+                $route .= '?lang=en';
+            }
+
+            $lotte_product_categories = [];
+            $response = $this->api_request($route);
+            if (isset($response['code']) && $response['code'] == 200 && isset($response['items'])) {
+                $lotte_product_categories = $response['items'];
+            }
+
+            return $lotte_product_categories;
+        }
+
         function logout()
         {
             return $this->set_token('');

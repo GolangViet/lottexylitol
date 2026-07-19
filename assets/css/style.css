@@ -92,7 +92,7 @@ fieldset[disabled] .btn-danger {
     text-shadow: 0 1px 0 #fff;
     border-color: #ccc
 }
- 
+
 .btn-default:hover,
 .btn-default:focus {
     background-color: #e0e0e0;
@@ -261,7 +261,7 @@ fieldset[disabled] .btn-info.active {
     background-color: #2aabd2;
     background-image: none
 }
- 
+
 .btn-warning {
     background-image: -webkit-linear-gradient(top, #f0ad4e 0%, #eb9316 100%);
     background-image: -o-linear-gradient(top, #f0ad4e 0%, #eb9316 100%);
@@ -433,7 +433,7 @@ fieldset[disabled] .btn-danger.active {
     -webkit-box-shadow: inset 0 3px 9px rgba(0, 0, 0, 0.25);
     box-shadow: inset 0 3px 9px rgba(0, 0, 0, 0.25)
 }
- 
+
 .navbar-inverse .navbar-brand,
 .navbar-inverse .navbar-nav>li>a {
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25)
@@ -583,7 +583,7 @@ fieldset[disabled] .btn-danger.active {
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff337ab7', endColorstr='#ff2b669a', GradientType=0);
     border-color: #2b669a
 }
- 
+
 .list-group-item.active .badge,
 .list-group-item.active:hover .badge,
 .list-group-item.active:focus .badge {
@@ -660,8 +660,8 @@ fieldset[disabled] .btn-danger.active {
     -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1)
 }
- 
- 
+
+
 /*!
  * Bootstrap v3.3.7 (http://getbootstrap.com)
  * Copyright 2011-2017 Twitter, Inc.
@@ -683,7 +683,7 @@ fieldset[disabled] .btn-danger.active {
 
 
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
- 
+
 html {
     font-family: sans-serif;
     -ms-text-size-adjust: 100%;
@@ -892,7 +892,7 @@ legend {
 textarea {
     overflow: auto
 }
- 
+
 optgroup {
     font-weight: bold
 }
@@ -906,10 +906,10 @@ td,
 th {
     padding: 0
 }
- 
- 
+
+
 /*! Source: https://github.com/h5bp/html5-boilerplate/blob/master/src/css/main.css */
- 
+
 @media print {
     *,
     *:before,
@@ -987,7 +987,7 @@ th {
     -moz-box-sizing: border-box;
     box-sizing: border-box
 }
- 
+
 *:before,
 *:after {
     -webkit-box-sizing: border-box;
@@ -1147,7 +1147,7 @@ h6 .small,
     line-height: 1;
     color: #777777
 }
- 
+
 h1,
 .h1,
 h2,
@@ -1418,7 +1418,7 @@ ol ol {
     padding-left: 5px;
     padding-right: 5px
 }
- 
+
 dl {
     margin-top: 0;
     margin-bottom: 20px
@@ -2234,7 +2234,7 @@ pre code {
         margin-left: 0%
     }
 }
- 
+
 @media (min-width: 1200px) {
     .col-lg-1,
     .col-lg-2,
@@ -2404,7 +2404,7 @@ pre code {
         margin-left: 0%
     }
 }
- 
+
 .fade {
     opacity: 0;
     -webkit-transition: opacity 0.15s linear;
@@ -2636,7 +2636,7 @@ button.close {
     content: " ";
     display: table
 }
- 
+
 .clearfix:after,
 .dl-horizontal dd:after,
 .container:after,
@@ -3019,7 +3019,7 @@ button.close {
 [dir='rtl'] .slick-next:before {
     content: ''
 }
- 
+
 .slick-slider {
     margin-bottom: 30px
 }
@@ -3644,7 +3644,7 @@ img {
         margin-left: -15px
     }
 }
- 
+
 .footer .bHead {
     font-size: 50px;
     font-size: 5rem
@@ -4168,7 +4168,7 @@ body {
         overflow-y: scroll
     }
 }
- 
+
 @media only screen and (max-width: 767px) and (max-width: 320px) {
     #top .footer .snsBox .clearfix>div,
     #why .footer .snsBox .clearfix>div,
@@ -4884,7 +4884,7 @@ html[lang='en'] .contact-vn {
     background-size: 100% auto;
     padding-top: 70px
 }
- 
+
 @media only screen and (max-width: 767px) {
     .bgmain {
         background-position: 75% -70px;
@@ -5288,13 +5288,14 @@ html[lang='en'] .contact-vn {
 }
 
 .product .prodSet2 .bg {
+    --product-set-background-pc: url(../img/product/bg_lime.png);
     position: absolute;
     left: 0;
     right: 0;
     width: 100%;
     height: 100%;
     max-height: 653px;
-    background: url(../img/product/bg_lime.png) no-repeat center center;
+    background: var(--product-set-background-pc) no-repeat center center;
     -moz-background-size: 100% 100%;
     -webkit-background-size: 100% 100%;
     -ms-background-size: 100% 100%;
@@ -5303,8 +5304,9 @@ html[lang='en'] .contact-vn {
 
 @media only screen and (max-width: 767px) {
     .product .prodSet2 .bg {
+        --product-set-background-sp: url(../img/product/bg_lime_sp.png);
         max-height: 380px;
-        background-image: url(../img/product/bg_lime_sp.png);
+        background-image: var(--product-set-background-sp);
         background-position: 50% 50%;
         -moz-background-size: 100% 100%;
         -webkit-background-size: 100% 100%;
@@ -5493,7 +5495,7 @@ html[lang='en'] .contact-vn {
     height: 402px;
     background: url(../img/product/shadow_strawberry.png) no-repeat right top
 }
- 
+
 @media only screen and (max-width: 767px) {
     .product .prodSet2.strawberry .text {
         margin-bottom: 140px !important
@@ -6104,7 +6106,7 @@ html[lang='en'] .contact-vn {
         border-right: 0
     }
 }
- 
+
 .leftCol {
     width: 70%;
     float: left
@@ -6539,7 +6541,7 @@ form p.test br {
     -moz-border-radius: 50%;
     border-radius: 50%
 }
- 
+
 .movieBlock .videoList li .img:before {
     content: '';
     position: absolute;
