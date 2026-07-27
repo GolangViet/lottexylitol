@@ -7,3 +7,5 @@
 /docker/mariadb/mariadb-data
 /docker/postgres/postgres-data
 *.DS_Store
+backup-2026/
+docker/mariadb/mariadb-data/
