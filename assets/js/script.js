@@ -978,7 +978,7 @@
                 e.preventDefault();
             }
         })
-        .on('blur change', function () {
+        .on('blur change focusout', function () {
             this.value = this.value.trim().replace(/\s+/g, ' ');
         })
         .on('paste', function (e) {
