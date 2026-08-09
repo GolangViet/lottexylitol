@@ -3175,7 +3175,8 @@ button.close {
 }
 
 .slick-slide img {
-    display: block
+    display: block;
+    width: 100%;
 }
 
 .slick-slide.slick-loading img {
