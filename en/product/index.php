@@ -94,9 +94,9 @@ $productCategories = $lotte_api->get_product_categories();
                                                     <img
                                                         style="width: 120px;"
                                                         src="<?php echo $productDetail['thumbnail']['url'] ?? ($defaultProductDetail['thumbnail']['url'] ?? ''); ?>"
-                                                        alt="<?php echo $productDetail['title'] ?? ($defaultProductDetail['title'] ?? ''); ?>" />
+                                                        alt="<?php echo $productDetail['unit']['label'] ?? ($defaultProductDetail['unit']['label'] ?? ''); ?>" />
                                                     <span>
-                                                        <?php echo $productDetail['title'] ?? ($defaultProductDetail['title'] ?? ''); ?>
+                                                        <?php echo $productDetail['unit']['label'] ?? ($defaultProductDetail['unit']['label'] ?? ''); ?>
                                                         <em>
                                                             <?php echo $productDetail['weight']['value'] ?? ($defaultProductDetail['weight']['value'] ?? ''); ?>
                                                             <?php echo $productDetail['weight']['unit']['value'] ?? ($defaultProductDetail['weight']['unit']['value'] ?? ''); ?>
